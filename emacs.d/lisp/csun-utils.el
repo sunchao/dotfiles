@@ -1,4 +1,4 @@
-;; Last Modified: Thu May 14 09:48:15 2015.
+;; Last Modified: Sun Jun 14 10:47:44 2015.
 ;; utility functions
 
 (defun copy-lines-matching-re (re)
@@ -135,21 +135,17 @@ putting the matching lines in a buffer named *matching*"
   (command-execute 'split-window-horizontally)
   (command-execute 'balance-windows))
 
-
 ;; keybindings
 (global-set-key (kbd "C-c t") 'describe-function-in-popup)
 (global-set-key (kbd "C-x a t") 'query-replace-word-under-cursor)
 (global-set-key (kbd "C-x 4") 'split-3-windows)
 
-
 ;; Some settings
-
 (add-hook 'write-file-hooks
           (lambda ()
             (set-last-modified-tag)))
 
 ;;; CTAGS stuff
-
 (defun create-tags (dir-name)
   " Create CTAGS under directory `dir-name`"
   (interactive "DDirectory: ")
