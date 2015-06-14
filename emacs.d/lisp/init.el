@@ -100,6 +100,11 @@
 ;; (setq whitespace-line-column 80)
 ;; (global-whitespace-mode 1)
 
+;; Wind Move
+(windmove-default-keybindings 'meta)
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings))
+
 ;; give duplicated buffer name more information
 (setq uniquify-buffer-name-style 'post-forward
       uniquify-seperator ":")
@@ -204,27 +209,23 @@
 
 
 ;;; Twelf mode
-(setq twelf-root "/usr/local/twelf/")
-
-;; make the variable more recognizable
-(setq twelf-font-dark-background t)
-(load (concat twelf-root "emacs/twelf-init.el"))
-(load (concat twelf-root "emacs/twelf-font.el"))
-
-(defun brown-vars ()
-  (twelf-font-create-face 'twelf-font-evar-face 'default "red"))
-;; NO need for this with dark background
-;; (brown-vars)
-
-(add-hook
-  'twelf-mode-hook
-  '(lambda ()
-    (setq twelf-chatter "1")
-    (setq twelf-unsafe "true")
-    (setq twelf-indent 2) ;; set indentation to 2
-    (set-fill-column 100) ;; break line at 78
-    (auto-fill-mode))) ;; auto wrap lines
-
+(cond
+ ((file-exists-p "/usr/local/twelf/emacs/twelf-init.el")
+ (progn
+   (setq twelf-root "/usr/local/twelf/")
+   ;; make the variable more recognizable
+   (setq twelf-font-dark-background t)
+   (load (concat twelf-root "emacs/twelf-init.el"))
+   (load (concat twelf-root "emacs/twelf-font.el"))
+   (add-hook
+    'twelf-mode-hook
+    '(lambda ()
+       (setq twelf-chatter "1")
+       (setq twelf-unsafe "true")
+       (setq twelf-indent 2) ;; set indentation to 2
+       (set-fill-column 100) ;; break line at 78
+       (auto-fill-mode))) ;; auto wrap lines
+   )))
 
 ;; key bindings
 (global-set-key (kbd "C-c C-v") 'compile)
