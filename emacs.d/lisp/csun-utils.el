@@ -1,7 +1,5 @@
-;; Last Modified: Sat May  2 14:29:12 2015.
+;; Last Modified: Thu May 14 09:48:15 2015.
 ;; utility functions
-
-(require 'popup)
 
 (defun copy-lines-matching-re (re)
   "find all lines matching the regexp RE in the current buffer
@@ -129,18 +127,26 @@ putting the matching lines in a buffer named *matching*"
       (while (re-search-forward "\\Last Modified:\\([A-Za-z0-9: ]*\\)?\\." nil t)
         (replace-match tostr nil t)))))
 
-(provide 'csun-utils)
+(defun split-3-windows ()
+  "Split the current window into 3 equal-size sub-windows.
+   Useful for large monitor"
+  (interactive)
+  (command-execute 'split-window-horizontally)
+  (command-execute 'split-window-horizontally)
+  (command-execute 'balance-windows))
+
 
 ;; keybindings
 (global-set-key (kbd "C-c t") 'describe-function-in-popup)
 (global-set-key (kbd "C-x a t") 'query-replace-word-under-cursor)
+(global-set-key (kbd "C-x 4") 'split-3-windows)
+
 
 ;; Some settings
 
 (add-hook 'write-file-hooks
           (lambda ()
             (set-last-modified-tag)))
-
 
 ;;; CTAGS stuff
 
@@ -151,3 +157,5 @@ putting the matching lines in a buffer named *matching*"
    (format "ctags -e -R %s" dir-name)))
 
 (setq tags-table-list '(""))
+
+(provide 'csun-utils)

@@ -1,55 +1,62 @@
+(require 'package)
+
 (add-to-list 'load-path "~/.emacs.d/lisp")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/my-themes")
 
-(require 'package)
-(require 'cl)
+(defun init-file ()
+  (interactive)
+  (find-file "~/.emacs.d/lisp/init.el"))
 
 ;;; personal information
 (setq user-full-name "Chao Sun")
 (setq user-mail-address "sunchao.chris@gmail.com")
 
-(add-to-list 'package-archives
-  '("marmalade" . "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives
-  '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(setq package-list
+ '(paredit
+   popup ggtags ack
+   ;; modes for C++ dev
+   cmake-mode cmake-project irony flymake-google-cpplint))
+
+(setq package-archives '(("elpa" . "http://tromey.com/elpa/")
+			 ("gnu" . "http://elpa.gnu.org/packages/")
+			 ("marmalade" . "http://marmalade-repo.org/packages/")
+       ("melpa" . "http://melpa.org/packages/")))
 
 (package-initialize)
 
-;; If for some reason, you got this error:
-;; Error during download request: Not Found
-;; Just do M-x package-refresh-contents
+(unless package-archive-contents
+  (package-refresh-contents))
 
-(defvar my-packages
-  '(paredit))
-
-(dolist (p my-packages)
+(dolist (p package-list)
   (when (not (package-installed-p p))
     (package-install p)))
 
-;; for mac
-;(defvar macosx-p  (string-match "darwin" (symbol-name system-type)))
+(require 'cl)
+(require 'uniquify)
+(require 'cc-mode) ;; C++ mode
+(require 'flymake) ;; Syntax checking on the fly
+(require 'popup)
+(require 'irony)
+(require 'csun-utils) ;; Utility functions
+(require 'csun-org) ;; Org mode
 
-(setq mac-option-modifier 'super) ;; mac-specific key binding
-(setq mac-command-modifier 'meta)  ;;
-(set-default-font "Liberation Mono 12")
-
-
-;; (remove-hook 'prog-mode-hook 'esk-turn-on-hl-line-mode)
+(let ((sys (symbol-name system-type)))
+      (cond ((string-match sys "darwin")
+             (progn
+               (setq mac-option-modifier 'super) ;; mac-specific key binding
+               (setq mac-command-modifier 'meta)  ;;
+               (set-default-font "Liberation Mono 10")
+               (load-theme 'Darkula t)))
+            ((string-match sys "gnu/linux")
+             (progn
+               (setq x-super-keysym 'meta)
+               (set-default-font "Source Code Pro 10")))))
 
 ;; fix path issues when launching emacs GUI under Mac
 (defun set-exec-path-from-shell-PATH ()
   (let ((path-from-shell (shell-command-to-string "$SHELL -i -c 'echo $PATH'")))
     (setenv "PATH" path-from-shell)
     (setq exec-path (split-string path-from-shell path-separator))))
-
-;; (when window-system (set-exec-path-from-shell-PATH))
-
-;; configuration on faces.
-(when (not package-archive-contents)
-  (package-refresh-contents))
-
-;; change meta key. For Ubuntu only!
-(setq x-super-keysym 'meta)
 
 ;; add to PATH and exec path
 (setq shell-file-name "/bin/bash")
@@ -99,22 +106,18 @@
 (setq-default fill-column 80) ;; 70 -> 80
 (scroll-bar-mode -1) ;; don't need scroll bar
 
-;; (remove-hook 'coding-hook 'turn-on-hl-line-mode) ;; turn off hl-line-mode
-
-(load-theme 'Darkula t)
-;; (load-theme 'solarized-dark t)
 
 ;; give duplicated buffer name more information
-(require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward
       uniquify-seperator ":")
 
-;; aliases
-(defalias 'qrr 'query-and-replace)
+(require 'find-file-in-repository)
 
 ;; key bindings
 (global-set-key (kbd "C-c C-v") 'compile)
-(global-set-key (kbd "C-c C-r") 'query-replace)
+(global-set-key (kbd "C-c C-r") 'query-replace-regexp)
+(global-set-key (kbd "C-c C-f") 'find-file-in-repository)
+(global-set-key (kbd "C-c C-g") 'ack)
 (global-set-key (kbd "C-x a c") 'comment-region)
 (global-set-key (kbd "C-x a u") 'uncomment-region)
 (global-set-key (kbd "C-x a d") 'delete-trailing-whitespace)
@@ -126,14 +129,11 @@
 
 (autoload 'gtags-mode "gtags" "" t)
 
-
 (setq display-time-string-forms
       '((format-time-string "%m/%d:%H:%M" now)
         (if mail " Mail" "") " ")
       display-time-mail-file "/var/mail/csun"
       display-time-mail-face 'display-time-mail-face)
-
-;; (display-time-mode nil)
 
 (setq-default mode-line-format
               (list
@@ -145,23 +145,76 @@
                " "
                'mode-line-misc-info))
 
-(defun init-file ()
-  (interactive)
-  (find-file "/Users/chao/.emacs.d/lisp/init.el"))
 
-(require 'csun-utils)
-(require 'csun-cpp)
-; (require 'csun-elisp)
-(require 'csun-ido)
-(require 'csun-org)
-(require 'csun-babel)
-(require 'csun-sml)
-(require 'csun-twelf)
-(require 'csun-haskell)
-; (require 'csun-clisp)
-; (require 'csun-clojure)
-(require 'csun-ruby)
-(require 'csun-sh)
-(require 'csun-yasnippet)
+;;; Magit mode
+;;; To prevent Magit from reverting all unmodified buffer
+(setq magit-auto-revert-mode nil)
 
 
+;;; Paredit mode
+(autoload 'enable-paredit-mode "paredit" t)
+(add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+
+;;; IDO mode
+(ido-mode t)
+(setq ido-enable-flex-matching nil) ;; enable fuzzy matching
+
+;;; SML mode
+(defun my-sml-mode-hook () "Local defaults for SML mode"
+  (setq sml-indent-level 2)        ; conserve on horizontal space
+  (setq words-include-escape t)    ; \ loses word break status
+  (setq indent-tabs-mode nil))     ; never ever indent with tabs
+(add-hook 'sml-mode-hook 'my-sml-mode-hook)
+
+;;; C++ mode
+(setq-default c-basic-offset 2 c-default-style "linux")
+(setq-default tab-width 2 indent-tabs-mode nil)
+
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'c-mode-hook 'irony-mode)
+
+(defun my:flymake-google-init()
+  (require 'flymake-google-cpplint)
+  (custom-set-variables
+   '(flymake-google-cpplint-command "/usr/local/bin/cpplint"))
+  (flymake-google-cpplint-load))
+;; (add-hook 'c-mode-hook 'my:flymake-google-init)
+;; (add-hook 'c++-mode-hook 'my:flymake-google-init)
+
+;;; Use Google C++ style
+(require 'google-c-style)
+(add-hook 'c++-mode-hook 'google-set-c-style)
+(add-hook 'c++-mode-hook 'google-make-newline-indent)
+
+(require 'ggtags) ;; See https://github.com/leoliu/ggtags
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+              (ggtags-mode 1))))
+
+(define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
+(define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
+(define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
+(define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
+(define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
+(define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
+
+(define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
+
+;; replace the `completion-at-point' and `complete-symbol' bindings in
+;; irony-mode's buffers by irony-mode's function
+(defun my-irony-mode-hook ()
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async))
+(add-hook 'irony-mode-hook 'my-irony-mode-hook)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-irony))
+
+;; (optional) adds CC special commands to `company-begin-commands' in order to
+;; trigger completion at interesting places, such as after scope operator
+;;     std::|
+(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)

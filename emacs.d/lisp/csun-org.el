@@ -1,4 +1,5 @@
 (require 'org-install)
+(require 'ob-tangle)
 (require 'csun-utils)
 
 ;;; Some tips:
@@ -102,5 +103,20 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
         (setq pairs (cons (list new old) pairs)))))
     (mapc (lambda (p) (princ (concat "\t- [[#" (car p) "][" (cadr p) "]]\n")
                         (current-buffer))) pairs)))
+
+
+;;; Babel mode
+
+(org-babel-do-load-languages ;; toggle language support
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (R . t)
+   (ruby . t)
+   (python . t)
+   (clojure . t)
+   (sh . t)
+   (latex . t)))
+
+(setq org-src-fontify-natively t) ;; fontify code block automatically
 
 (provide 'csun-org)
