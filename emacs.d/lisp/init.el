@@ -20,7 +20,7 @@
 ;;; All the required packages should be in here.
 (setq package-list
       '(paredit cl popup ggtags ack flymake
-      magit find-file-in-repository google-c-style
+      magit find-file-in-repository google-c-style fill-column-indicator
     ;; modes for C++ dev
       cc-mode cmake-mode cmake-project irony flymake-google-cpplint))
 
@@ -49,6 +49,7 @@
 (require 'csun-utils) ;; Utility functions
 (require 'csun-org) ;; Org mode
 
+
 ;;; Set font and keybindings specific to OS
 (let ((sys (symbol-name system-type)))
   (cond ((string-match sys "darwin")
@@ -59,8 +60,8 @@
            (load-theme 'Darkula t)))
         ((string-match sys "gnu/linux")
          (progn
-           (setq x-super-keysym 'meta)
-           (set-default-font "Source Code Pro 10")))))
+           (set-default-font "Liberation Mono 9")
+           (setq x-super-keysym 'meta)))))
 
 ;; add to PATH and exec path
 (setq shell-file-name "/bin/bash")
@@ -93,17 +94,28 @@
 (setq inhibit-startup-msg t) ;; disable startup message
 (setq make-backup-files -1)
 (setq-default show-trailing-whitespace -1)
-(setq-default fill-column 80) ;; 70 -> 80
+(setq-default fill-column 90) ;; 70 -> 90
 (scroll-bar-mode -1) ;; don't need scroll bar
 ;; (setq whitespace-style '(trailing lines space-before-tab
 ;;                                   indentation space-after-tab))
 ;; (setq whitespace-line-column 80)
 ;; (global-whitespace-mode 1)
 
+;; Don't want trailing whitespace for term
+(add-hook 'term-mode-hook
+  (lambda ()
+    (progn
+      (setq show-trailing-whitespace nil))))
+
 ;; Wind Move
 (windmove-default-keybindings 'meta)
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings))
+
+;; Add column indicator
+(require 'fill-column-indicator)
+(add-hook 'after-change-major-mode-hook 'fci-mode)
+(setq fci-rule-color "green")
 
 ;; give duplicated buffer name more information
 (setq uniquify-buffer-name-style 'post-forward
@@ -207,6 +219,25 @@
 ;;     std::|
 (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
 
+;; For RecordService development
+(defun open-or-switch-to (file)
+ (let ((existing-buffer (find-buffer-visiting file)))
+   (cond (existing-buffer (switch-to-buffer existing-buffer))
+         (t (find-file-existing file)))))
+
+(defun switch-to-header-or-impl ()
+ (interactive)
+ (let ((other-file
+        (cond
+         ((not (buffer-file-name)) (error "Buffer not visiting a file"))
+         ((string-match-p "\\.cc$" (buffer-file-name))
+          (replace-regexp-in-string "\\.cc$" ".h"  (buffer-file-name)))
+         ((string-match-p "\\.h$" (buffer-file-name))
+          (replace-regexp-in-string "\\.h$" ".cc" (buffer-file-name)))
+         (t (error "Not a .cc or .h file: %s" (buffer-file-name))))))
+        (open-or-switch-to other-file)))
+(global-set-key (kbd "C-M-;") 'switch-to-header-or-impl)
+
 
 ;;; Twelf mode
 (cond
@@ -233,9 +264,8 @@
 (global-set-key (kbd "C-c C-f") 'find-file-in-repository)
 (global-set-key (kbd "C-c C-g") 'ack)
 (global-set-key (kbd "C-c C-e") 'magit-status)
+(global-set-key (kbd "C-c C-q") 'magit-blame-mode)
 (global-set-key (kbd "C-x a c") 'comment-region)
 (global-set-key (kbd "C-x a u") 'uncomment-region)
 (global-set-key (kbd "C-x a d") 'delete-trailing-whitespace)
 (global-set-key (kbd "C-x a r") 'align-regexp)
-
-
