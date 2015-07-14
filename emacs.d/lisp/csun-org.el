@@ -20,6 +20,9 @@
 ;; Resume clocking tasks when emacs is restarted
 (org-clock-persistence-insinuate)
 
+;; Set idle time
+(setq org-clock-idle-time 10)
+
 ;; Do not prompt to resume an active clock
 (setq org-clock-persist-query-resume nil)
 
