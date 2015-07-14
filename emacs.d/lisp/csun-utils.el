@@ -1,4 +1,4 @@
-;; Last Modified: Sun Jun 14 10:47:44 2015.
+;; Last Modified: Mon Jul 13 14:11:34 2015.
 ;; utility functions
 
 (defun copy-lines-matching-re (re)
@@ -69,10 +69,10 @@ putting the matching lines in a buffer named *matching*"
                (forward-line)
              (setq count (1+ count)))
              count))))
-    (save-excursion
-      (goto-char begin)
-      (while (> nlines 0)
-        (beginning-of-line)
+    (while (> nlines 0)
+      (beginning-of-line)
+      (save-excursion
+        (goto-char begin)
         (insert-char `?\ ' n t)
         (setq nlines (1- nlines))
         (forward-line)))))
@@ -153,5 +153,27 @@ putting the matching lines in a buffer named *matching*"
    (format "ctags -e -R %s" dir-name)))
 
 (setq tags-table-list '(""))
+
+(defun gtags-root-dir ()
+  "Returns GTAGS root directory or nil if doesn't exist."
+  (with-temp-buffer
+    (if (zerop (call-process "global" nil t nil "-pr"))
+        (buffer-substring (point-min) (1- (point-max)))
+      nil)))
+
+(defun gtags-update ()
+  "Make GTAGS incremental update"
+  (call-process "global" nil nil nil "-u"))
+
+(defun gtags-update-hook ()
+  (when (gtags-root-dir)
+    (gtags-update)))
+
+(defun insert-cdh-jira (jira-number)
+  "Insert a org-mode link at the point for the specified CDH jira"
+  (interactive "sJIRA Number: ")
+  (insert
+   (concat "[[https://jira.cloudera.com/browse/CDH-" jira-number
+           "][CDH-" jira-number "]]")))
 
 (provide 'csun-utils)

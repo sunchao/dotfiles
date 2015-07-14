@@ -57,7 +57,7 @@
 ;;; Quickly find my GTD file
 (defun gtd ()
   (interactive)
-  (find-file "/Users/chao/Dropbox/org/gtd.org"))
+  (find-file (concat (getenv "HOME") "/Dropbox/org/gtd.org")))
 
 ;;; I found that, often given a Hive JIRA number, I need to create a corresponding URL
 ;;; link to it.

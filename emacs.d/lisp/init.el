@@ -22,7 +22,9 @@
       '(paredit cl popup ggtags ack flymake
       magit find-file-in-repository google-c-style fill-column-indicator
     ;; modes for C++ dev
-      cc-mode cmake-mode cmake-project irony flymake-google-cpplint))
+      cc-mode cmake-mode cmake-project flymake-google-cpplint company
+      irony
+      ))
 
 (setq package-archives '(("elpa" . "http://tromey.com/elpa/")
 			 ("gnu" . "http://elpa.gnu.org/packages/")
@@ -60,8 +62,8 @@
            (load-theme 'Darkula t)))
         ((string-match sys "gnu/linux")
          (progn
-           (set-default-font "Liberation Mono 9")
-           (setq x-super-keysym 'meta)))))
+           (setq x-super-keysym 'meta)
+           (set-default-font "Liberation Mono 9")))))
 
 ;; add to PATH and exec path
 (setq shell-file-name "/bin/bash")
@@ -113,9 +115,9 @@
   (windmove-default-keybindings))
 
 ;; Add column indicator
-(require 'fill-column-indicator)
-(add-hook 'after-change-major-mode-hook 'fci-mode)
-(setq fci-rule-color "green")
+; (require 'fill-column-indicator)
+; (add-hook 'after-change-major-mode-hook 'fci-mode)
+; (setq fci-rule-color "green")
 
 ;; give duplicated buffer name more information
 (setq uniquify-buffer-name-style 'post-forward
@@ -186,11 +188,16 @@
 (add-hook 'c++-mode-hook 'google-set-c-style)
 (add-hook 'c++-mode-hook 'google-make-newline-indent)
 
+;;; Gtags stuff
 (require 'ggtags) ;; See https://github.com/leoliu/ggtags
 (add-hook 'c-mode-common-hook
           (lambda ()
             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
               (ggtags-mode 1))))
+
+;; gtags-update-hook is defined in csun-utils.el.
+;; This updates gtags upon saving file.
+(add-hook 'after-save-hook #'gtags-update-hook)
 
 (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
 (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
@@ -200,6 +207,10 @@
 (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
 
 (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
+
+;; Company mode
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
 
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; irony-mode's buffers by irony-mode's function
@@ -217,7 +228,8 @@
 ;; (optional) adds CC special commands to `company-begin-commands' in order to
 ;; trigger completion at interesting places, such as after scope operator
 ;;     std::|
-(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+;; (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+;; (add-hook 'c++-mode-hook 'irony-mode)
 
 ;; For RecordService development
 (defun open-or-switch-to (file)
@@ -236,8 +248,13 @@
           (replace-regexp-in-string "\\.h$" ".cc" (buffer-file-name)))
          (t (error "Not a .cc or .h file: %s" (buffer-file-name))))))
         (open-or-switch-to other-file)))
-(global-set-key (kbd "C-M-;") 'switch-to-header-or-impl)
+(global-set-key (kbd "M-p") 'switch-to-header-or-impl)
 
+;;; Python mode
+(add-hook 'python-mode-hook
+          (lambda ()
+            (setq tab-width 2)
+            (setq python-indent 2)))
 
 ;;; Twelf mode
 (cond
@@ -263,9 +280,12 @@
 (global-set-key (kbd "C-c C-r") 'query-replace-regexp)
 (global-set-key (kbd "C-c C-f") 'find-file-in-repository)
 (global-set-key (kbd "C-c C-g") 'ack)
-(global-set-key (kbd "C-c C-e") 'magit-status)
-(global-set-key (kbd "C-c C-q") 'magit-blame-mode)
 (global-set-key (kbd "C-x a c") 'comment-region)
 (global-set-key (kbd "C-x a u") 'uncomment-region)
 (global-set-key (kbd "C-x a d") 'delete-trailing-whitespace)
 (global-set-key (kbd "C-x a r") 'align-regexp)
+
+;;; Magit keybindings
+(global-set-key (kbd "C-x n s") 'magit-status)
+(global-set-key (kbd "C-x n b") 'magit-blame-mode)
+(global-set-key (kbd "C-x n l") 'magit-file-log)
