@@ -151,6 +151,18 @@
 (setq magit-auto-revert-mode nil)
 (setq magit-last-seen-setup-instructions "1.4.0")
 
+;; Remove diff highlight
+(defun disable-magit-highlight-in-buffer ()
+  (face-remap-add-relative 'magit-item-highlight '()))
+
+(add-hook 'magit-status-mode-hook 'disable-magit-highlight-in-buffer)
+
+(eval-after-load 'magit
+  '(progn
+   (set-face-foreground 'magit-diff-add "green2")
+   (set-face-foreground 'magit-diff-del "red2")
+   (unless window-system
+     (set-face-background 'magit-item-highlight "black"))))
 
 ;;; Paredit mode
 (autoload 'enable-paredit-mode "paredit" t)
