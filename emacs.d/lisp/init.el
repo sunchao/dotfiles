@@ -2,6 +2,7 @@
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
+
 ;;; 'lisp/my-themes' contains themes that cannot be installed via the
 ;;; the built-in theme installer.
 (add-to-list 'load-path "~/.emacs.d/lisp")
@@ -62,8 +63,12 @@
            (load-theme 'Darkula t)))
         ((string-match sys "gnu/linux")
          (progn
+           (load-theme 'zenburn t)
            (setq x-super-keysym 'meta)
            (set-default-font "Liberation Mono 9")))))
+
+; (set-frame-parameter (selected-frame) 'alpha '(100 60))
+; (add-to-list 'default-frame-alist '(alpha 100 60))
 
 ;; add to PATH and exec path
 (setq shell-file-name "/bin/bash")
@@ -163,6 +168,7 @@
    (set-face-foreground 'magit-diff-del "red2")
    (unless window-system
      (set-face-background 'magit-item-highlight "black"))))
+(add-hook 'magit-diff-mode-hook 'disable-magit-highlight-in-buffer)
 
 ;;; Paredit mode
 (autoload 'enable-paredit-mode "paredit" t)
@@ -184,8 +190,8 @@
 (setq-default c-basic-offset 2 c-default-style "linux")
 (setq-default tab-width 2 indent-tabs-mode nil)
 
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
+;; (add-hook 'c++-mode-hook 'irony-mode)
+;; (add-hook 'c-mode-hook 'irony-mode)
 
 (defun my:flymake-google-init()
   (require 'flymake-google-cpplint)
@@ -209,7 +215,7 @@
 
 ;; gtags-update-hook is defined in csun-utils.el.
 ;; This updates gtags upon saving file.
-(add-hook 'after-save-hook #'gtags-update-hook)
+;; (add-hook 'after-save-hook #'gtags-update-hook)
 
 (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
 (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
@@ -226,16 +232,6 @@
 
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; irony-mode's buffers by irony-mode's function
-(defun my-irony-mode-hook ()
-  (define-key irony-mode-map [remap completion-at-point]
-    'irony-completion-at-point-async)
-  (define-key irony-mode-map [remap complete-symbol]
-    'irony-completion-at-point-async))
-(add-hook 'irony-mode-hook 'my-irony-mode-hook)
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-(eval-after-load 'company
-  '(add-to-list 'company-backends 'company-irony))
 
 ;; (optional) adds CC special commands to `company-begin-commands' in order to
 ;; trigger completion at interesting places, such as after scope operator
