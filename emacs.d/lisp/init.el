@@ -491,6 +491,7 @@ Otherwise transpose sexps."
 (add-hook 'c-mode-hook 'impala-set-c-style)
 (add-hook 'c++-mode-hook 'impala-set-c-style)
 (add-hook 'c++-mode-hook 'google-make-newline-indent)
+(add-hook 'c++-mode-hook '(lambda () (setq fill-column 90)))
 
 ;; For RecordService development
 (defun open-or-switch-to (file)
@@ -526,7 +527,7 @@ Otherwise transpose sexps."
 ;;; ============================================================================
 
 (add-hook 'java-mode-hook '(lambda () (setq c-basic-offset 2)))
-(add-hook 'java-mode-hook '(lambda () (setq fill-column 80)))
+(add-hook 'java-mode-hook '(lambda () (setq fill-column 90)))
 (add-hook 'java-mode-hook 'turn-on-auto-fill)
 
 ;;; ================================= Python Mode ==============================
