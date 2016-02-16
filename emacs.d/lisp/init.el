@@ -34,6 +34,8 @@
         cmake-mode
         cmake-project
         flymake-google-cpplint
+        exec-path-from-shell
+        go-mode
         company
         irony))
 
@@ -60,28 +62,23 @@
 
 (require 'cl)
 
+;;; Set $PATH and exec-path from shell
+(exec-path-from-shell-initialize)
+
 ;;; Set font and keybindings specific to OSs
 (let ((sys (symbol-name system-type)))
   (cond ((string-match sys "darwin")
          (progn
            (setq mac-option-modifier 'super) ;; mac-specific key binding
            (setq mac-command-modifier 'meta)  ;;
-           (set-default-font "Liberation Mono 10")))
+           (set-default-font "Liberation Mono 12")))
         ((string-match sys "gnu/linux")
          (progn
            (setq x-super-keysym 'meta)
-           (set-default-font "Liberation Mono 9")))))
+           (set-default-font "Liberation Mono 10")))))
 
 ;; Use Zenburn color theme
 (load-theme 'zenburn t)
-
-; (set-frame-parameter (selected-frame) 'alpha '(100 60))
-; (add-to-list 'default-frame-alist '(alpha 100 60))
-
-;; add to PATH and exec path
-(setq shell-file-name "/bin/bash")
-(setenv "PATH" (concat "/usr/local/bin:" "/usr/texbin:" (getenv "PATH")))
-(setq exec-path (append '("/usr/local/bin" "/usr/texbin") exec-path))
 
 ;; set tab width
 ;; use space instead of tab
@@ -103,7 +100,7 @@
 (menu-bar-mode -1) ;; don't show menu bar
 (setq x-select-enable-clipboard t) ;; don't know what's this
 (auto-fill-mode t) ;; set auto fill
-(setq visible-bell t) ;; turn on visible bell instead of audible one
+;; (setq visible-bell t) ;; turn on visible bell instead of audible one
 (setq display-time-day-and-date t) ;; display stuff
 (setq global-font-lock-mode t) ;; enable font lock mode on all
 (setq inhibit-startup-msg t) ;; disable startup message
@@ -111,13 +108,13 @@
 (setq-default show-trailing-whitespace -1)
 (setq-default fill-column 90) ;; 70 -> 90
 (scroll-bar-mode -1) ;; don't need scroll bar
-;; (setq whitespace-style '(trailing lines space-before-tab
-;;                                   indentation space-after-tab))
+(setq whitespace-style '(trailing lines space-before-tab
+                                  indentation space-after-tab))
 ;; (setq whitespace-line-column 80)
 ;; (global-whitespace-mode 1)
 
 ;; Save session when exiting Emacs.
-(desktop-save-mode 1)
+; (desktop-save-mode 1)
 
 ;; Wind Move
 (windmove-default-keybindings 'meta)
@@ -312,6 +309,13 @@ putting the matching lines in a buffer named *matching*"
    (concat "[[https://jira.cloudera.com/browse/CDH-" jira-number
            "][CDH-" jira-number "]]")))
 
+(defun insert-apache-jira (jira-code)
+  "Insert a org-mode link at the point for the specified Apache jira"
+  (interactive "sJIRA Code: ")
+  (insert
+   (concat "[[https://issues.apache.org/jira/browse/" jira-code
+           "][" jira-code "]]")))
+
 (defun my-transpose-sexps ()
   "If point is after certain chars transpose chunks around that.
 Otherwise transpose sexps."
@@ -479,7 +483,7 @@ Otherwise transpose sexps."
 (add-hook 'c-mode-hook 'my:flymake-google-init)
 (add-hook 'c++-mode-hook 'my:flymake-google-init)
 
-(require 'impala-c-style) ;; Impala C/C++ Style
+;; (require 'impala-c-style) ;; Impala C/C++ Style
 
 ;; slight modifications for Impala
 ;; (defun impala-c++-style-hook ()
@@ -488,8 +492,8 @@ Otherwise transpose sexps."
 ;;   (c-set-offset 'arglist-close '++))
 ;; (add-hook 'c++-mode-hook 'impala-c++-style-hook)
 
-(add-hook 'c-mode-hook 'impala-set-c-style)
-(add-hook 'c++-mode-hook 'impala-set-c-style)
+;; (add-hook 'c-mode-hook 'impala-set-c-style)
+;; (add-hook 'c++-mode-hook 'impala-set-c-style)
 (add-hook 'c++-mode-hook 'google-make-newline-indent)
 (add-hook 'c++-mode-hook '(lambda () (setq fill-column 90)))
 
@@ -575,9 +579,10 @@ Otherwise transpose sexps."
     (TeX-fold-mode t)
     (outline-minor-mode t)))
 
-(add-hook 'LaTeX-mode-hook '(lambda () (setq fill-column 80)))
+(add-hook 'LaTeX-mode-hook '(lambda () (setq fill-column 90)))
 (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
 (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)	;; use pdflatex as default
+(add-hook 'LaTeX-mode-hook '(lambda () (local-set-key (kbd "C-c C-t") 'fill-region)))
 (setq TeX-view-program-list '(("Preview" "open -a Preview %o")))
 (setq TeX-view-program-selection '((output-pdf "Preview")))
 (setq-default TeX-master "main")	;; make AUCTEX aware of the default
@@ -617,6 +622,7 @@ Otherwise transpose sexps."
 ;;; - to add a note to a calendar item, press C-c C-z
 ;;; - to attach a file to a org item, press C-c C-a
 ;;; - to search all topics under a particular tag, use C-c \
+;;; - to insert a source code block, press <s
 
 ;; Resume clocking tasks when emacs is restarted
 (org-clock-persistence-insinuate)
@@ -639,6 +645,7 @@ Otherwise transpose sexps."
    (setq-default fill-column 80)
    (turn-on-font-lock)
    (turn-on-auto-fill)
+   (fci-mode) ;; turn-off fci mode
    (local-set-key (kbd "C-c w") 'delete-first-n)
    (local-set-key (kbd "C-c e") 'delete-trailing-whitespace)))
 
@@ -653,6 +660,32 @@ Otherwise transpose sexps."
           ("STARTED" . (:foreground "gold"))
           ("WAITING" . (:foreground "yellow"))
           ("CANCELLED" . (:foreground "blue" :weight bold)))))
+
+
+;;; ======================= Go Mode ======================== ;;;
+
+;;; Copy GOPATH
+(exec-path-from-shell-copy-env "GOPATH")
+(defun my-go-mode-hook ()
+  ; Use goimports instead of go-fmt
+  ; (setq gofmt-command "goimports")
+  ; Call Gofmt before saving
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  ; Customize compile command to run go build
+  (if (not (string-match "go" compile-command))
+      (set (make-local-variable 'compile-command)
+           "go generate && go build -v && go test -v && go vet"))
+  ; Go oracle
+  (load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
+  ; Godef jump key binding
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "C-c C-k") 'godoc))
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+(add-hook 'go-mode-hook 'company-mode)
+(add-hook 'go-mode-hook (lambda ()
+  (set (make-local-variable 'company-backends) '(company-go))
+  (company-mode)))
+
 
 ;;; =================== My customized functions ==================== ;;;
 
