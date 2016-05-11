@@ -33,6 +33,7 @@
         cc-mode
         cmake-mode
         cmake-project
+	zenburn-theme
         flymake-google-cpplint
         exec-path-from-shell
         go-mode
@@ -106,7 +107,7 @@
 (setq inhibit-startup-msg t) ;; disable startup message
 (setq make-backup-files -1)
 (setq-default show-trailing-whitespace -1)
-(setq-default fill-column 90) ;; 70 -> 90
+;; (setq-default fill-column 90) ;; 70 -> 90
 (scroll-bar-mode -1) ;; don't need scroll bar
 (setq whitespace-style '(trailing lines space-before-tab
                                   indentation space-after-tab))
@@ -123,8 +124,8 @@
 
 ;; Add column indicator
 (require 'fill-column-indicator)
-(add-hook 'after-change-major-mode-hook 'fci-mode)
-(setq fci-rule-color "yellow")
+;; (add-hook 'after-change-major-mode-hook 'fci-mode)
+;; (setq fci-rule-color "yellow")
 
 ;; give duplicated buffer name more information
 (require 'uniquify)
@@ -645,7 +646,7 @@ Otherwise transpose sexps."
    (setq-default fill-column 80)
    (turn-on-font-lock)
    (turn-on-auto-fill)
-   (fci-mode) ;; turn-off fci mode
+   (fci-mode 0) ;; turn-off fci mode
    (local-set-key (kbd "C-c w") 'delete-first-n)
    (local-set-key (kbd "C-c e") 'delete-trailing-whitespace)))
 
