@@ -27,16 +27,31 @@
         ack
         flymake
         magit
+
+        ;; Quickly locate file under git repo (with C-x C-f)
         find-file-in-repository
+
+        ;; Display a line at the column boundary
         fill-column-indicator
-        ;; modes for C++ dev
+
+        ;; For C++ dev
         cc-mode
         cmake-mode
         cmake-project
-	zenburn-theme
+
         flymake-google-cpplint
         exec-path-from-shell
+
+        ;; Color themes
+        zenburn-theme
+
+        ;; Go modules
         go-mode
+        go-eldoc
+        go-autocomplete
+        go-rename
+        go-dlv
+
         company
         irony))
 
@@ -47,8 +62,8 @@
        ("melpa" . "http://melpa.org/packages/")))
 
 
-;;; Initialize and update packages.
-(package-initialize)
+;;; Initialize and update package.
+(packages-initialize)
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -72,14 +87,36 @@
          (progn
            (setq mac-option-modifier 'super) ;; mac-specific key binding
            (setq mac-command-modifier 'meta)  ;;
-           (set-default-font "Liberation Mono 12")))
+           (set-default-font "Inconsolata 14")))
         ((string-match sys "gnu/linux")
          (progn
            (setq x-super-keysym 'meta)
            (set-default-font "Liberation Mono 10")))))
 
 ;; Use Zenburn color theme
-(load-theme 'zenburn t)
+;; (load-theme 'zenburn t)
+
+;; Mode line
+(setq-default mode-line-format
+              '("%e" mode-line-front-space
+                ;; Standard info about the current buffer
+                mode-line-mule-info
+                mode-line-client
+                mode-line-modified
+                mode-line-remote
+                mode-line-frame-identification
+                mode-line-buffer-identification " " mode-line-position
+                ;; Some specific information about the current buffer:
+                lunaryorn-projectile-mode-line ; Project information
+                (vc-mode lunaryorn-vc-mode-line) ; VC information
+                (flycheck-mode flycheck-mode-line) ; Flycheck status
+                (multiple-cursors-mode mc/mode-line) ; Number of cursors
+                ;; Misc information, notably battery state and function name
+                " "
+                mode-line-misc-info
+                ;; And the modes, which I don't really care for anyway
+                " " mode-line-modes mode-line-end-spaces))
+
 
 ;; set tab width
 ;; use space instead of tab
@@ -483,8 +520,11 @@ Otherwise transpose sexps."
   (flymake-google-cpplint-load))
 (add-hook 'c-mode-hook 'my:flymake-google-init)
 (add-hook 'c++-mode-hook 'my:flymake-google-init)
+(add-hook 'c++-mode-hook 'google-make-newline-indent)
+(add-hook 'c++-mode-hook '(lambda () (setq fill-column 90)))
 
-;; (require 'impala-c-style) ;; Impala C/C++ Style
+;; Impala C/C++ Style - inactive right now.
+;; (require 'impala-c-style) ;;
 
 ;; slight modifications for Impala
 ;; (defun impala-c++-style-hook ()
@@ -495,8 +535,6 @@ Otherwise transpose sexps."
 
 ;; (add-hook 'c-mode-hook 'impala-set-c-style)
 ;; (add-hook 'c++-mode-hook 'impala-set-c-style)
-(add-hook 'c++-mode-hook 'google-make-newline-indent)
-(add-hook 'c++-mode-hook '(lambda () (setq fill-column 90)))
 
 ;; For RecordService development
 (defun open-or-switch-to (file)
@@ -528,7 +566,7 @@ Otherwise transpose sexps."
 (global-set-key (kbd "M-p") 'switch-to-header-or-impl)
 
 
-;;; ================================= Java Mode ==============================
+;;; ================================= Java Mode ================================
 ;;; ============================================================================
 
 (add-hook 'java-mode-hook '(lambda () (setq c-basic-offset 2)))
@@ -668,24 +706,48 @@ Otherwise transpose sexps."
 ;;; Copy GOPATH
 (exec-path-from-shell-copy-env "GOPATH")
 (defun my-go-mode-hook ()
-  ; Use goimports instead of go-fmt
-  ; (setq gofmt-command "goimports")
-  ; Call Gofmt before saving
-  (add-hook 'before-save-hook 'gofmt-before-save)
-  ; Customize compile command to run go build
-  (if (not (string-match "go" compile-command))
-      (set (make-local-variable 'compile-command)
-           "go generate && go build -v && go test -v && go vet"))
-  ; Go oracle
-  (load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
-  ; Godef jump key binding
+  (whitespace-mode -1) ; don't highlight hard tabs
   (local-set-key (kbd "M-.") 'godef-jump)
-  (local-set-key (kbd "C-c C-k") 'godoc))
+  (auto-complete-mode 1)
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  (setq
+   gofmt-command "goimports"
+   tab-width 2         ; display tabs as two-spaces
+   indent-tabs-mode 1  ; use hard tabs to indent
+   fill-column 100)    ; set a reasonable fill width
+  )
+
 (add-hook 'go-mode-hook 'my-go-mode-hook)
-(add-hook 'go-mode-hook 'company-mode)
-(add-hook 'go-mode-hook (lambda ()
-  (set (make-local-variable 'company-backends) '(company-go))
-  (company-mode)))
+
+;; Set up go-eldoc.el with gocode for auto-completion and documentation.
+(require 'go-eldoc)
+(add-hook 'go-mode-hook 'go-eldoc-setup)
+
+;; Set up autocomplete for Go and bind the force completion to control+tab.
+(require 'go-autocomplete)
+(require 'auto-complete-config)
+(define-key ac-mode-map (kbd "C-TAB") 'auto-complete)
+
+
+;; (defun my-go-mode-hook ()
+;;   ; Use goimports instead of go-fmt
+;;   ; (setq gofmt-command "goimports")
+;;   ; Call Gofmt before saving
+;;   (add-hook 'before-save-hook 'gofmt-before-save)
+;;   ; Customize compile command to run go build
+;;   (if (not (string-match "go" compile-command))
+;;       (set (make-local-variable 'compile-command)
+;;            "go generate && go build -v && go test -v && go vet"))
+;;   ; Go oracle
+;;   (load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
+;;   ; Godef jump key binding
+;;   (local-set-key (kbd "M-.") 'godef-jump)
+;;   (local-set-key (kbd "C-c C-k") 'godoc))
+;; (add-hook 'go-mode-hook 'my-go-mode-hook)
+;; (add-hook 'go-mode-hook 'company-mode)
+;; (add-hook 'go-mode-hook (lambda ()
+;;   (set (make-local-variable 'company-backends) '(company-go))
+;;   (company-mode)))
 
 
 ;;; =================== My customized functions ==================== ;;;
