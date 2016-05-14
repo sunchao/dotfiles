@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified:
+;;; Last Modified: Fri May 13 09:59:08 2016.
 
 (require 'package)
 
@@ -9,18 +9,22 @@
 ;;; 'lisp/my-themes' contains themes that cannot be installed via the
 ;;; the built-in theme installer.
 
-(add-to-list 'load-path "~/.emacs.d/lisp")
-(add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/my-themes")
+;; Default conf dir
+(defun emacs-conf-dir () (concat (getenv "HOME") "/.emacs.d/lisp"))
+
+(add-to-list 'load-path (emacs-conf-dir))
+(add-to-list 'custom-theme-load-path (concat (emacs-conf-dir) "/my-themes"))
 
 ;;; A short-cut to the init file
 (defun init-file ()
   (interactive)
-  (find-file "~/.emacs.d/lisp/init.el"))
+  (find-file (concat (emacs-conf-dir) "/init.el")))
 
 ;;; A list of packages required.
 ;;; ALL the required packages should be in here.
 (setq package-list
-      '(paredit
+      '(
+        paredit
         cl
         popup
         ggtags
@@ -63,7 +67,7 @@
 
 
 ;;; Initialize and update package.
-(packages-initialize)
+(package-initialize)
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -138,7 +142,6 @@
 (menu-bar-mode -1) ;; don't show menu bar
 (setq x-select-enable-clipboard t) ;; don't know what's this
 (auto-fill-mode t) ;; set auto fill
-;; (setq visible-bell t) ;; turn on visible bell instead of audible one
 (setq display-time-day-and-date t) ;; display stuff
 (setq global-font-lock-mode t) ;; enable font lock mode on all
 (setq inhibit-startup-msg t) ;; disable startup message
@@ -148,9 +151,6 @@
 (scroll-bar-mode -1) ;; don't need scroll bar
 (setq whitespace-style '(trailing lines space-before-tab
                                   indentation space-after-tab))
-;; (setq whitespace-line-column 80)
-;; (global-whitespace-mode 1)
-
 ;; Save session when exiting Emacs.
 ; (desktop-save-mode 1)
 
@@ -647,7 +647,6 @@ Otherwise transpose sexps."
        (set-fill-column 100) ;; break line at 100
        (auto-fill-mode))) ;; auto wrap lines
    )))
-
 
 ;;; =============================== Org Mode ===================================
 ;;; ============================================================================
