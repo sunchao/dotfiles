@@ -1,6 +1,6 @@
 [user]
 	name = Chao Sun
-	email = sunchao.chris@gmail.com
+	email = sunchao@uber.com
 [alias]
   co = checkout
   ci = commit
@@ -9,5 +9,19 @@
   lp = log --pretty=oneline
   br = branch
   df = diff
+  df1 = diff @~1
+  df2 = diff @~2
+  df3 = diff @~3
+  df4 = diff @~4
+  df5 = diff @~5
+  df6 = diff @~6
   dc = diff --cached
 
+[branch]
+	autosetuprebase = always
+[rerere]
+	enabled = true
+[url "ssh://gitolite@code.uber.internal/"]
+	insteadOf = git://code.uber.internal/
+[url "ssh://git@github.com/uber/"]
+	insteadOf = https://github.com/uber/
