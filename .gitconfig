@@ -3,6 +3,7 @@
 	email = sunchao@uber.com
 [alias]
   co = checkout
+  ca = commit --amend
   ci = commit
   st = status
   lg = log -p
