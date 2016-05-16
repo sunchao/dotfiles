@@ -17,6 +17,7 @@
   df5 = diff @~5
   df6 = diff @~6
   dc = diff --cached
+  cp = cherry-pick
 
 [branch]
 	autosetuprebase = always
