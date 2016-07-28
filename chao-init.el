@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sun May 15 21:29:57 2016.
+;;; Last Modified: Wed Jul 27 18:54:16 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -18,11 +18,14 @@
   (interactive)
   (find-file (concat (emacs-conf-dir) "/chao-init.el")))
 
+;;; Disable the undo-tree mode
+(global-undo-tree-mode 0)
 
 ;;; ====================== A bunch of config setups ============================
 ;;; ============================================================================
 
 (require 'cl)
+;; (global-flycheck-mode)
 
 ;;; Set $PATH and exec-path from shell
 (exec-path-from-shell-initialize)
@@ -409,8 +412,8 @@ Otherwise transpose sexps."
 ;; =============================================================================
 
 ;; Company mode
-;; (require 'company)
-;; (add-hook 'after-init-hook 'global-company-mode)
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
 
 ;; ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; ;; irony-mode's buffers by irony-mode's function
@@ -474,6 +477,8 @@ Otherwise transpose sexps."
          ((not (buffer-file-name)) (error "Buffer not visiting a file"))
          ((string-match-p "\\.cc$" (buffer-file-name))
           (replace-regexp-in-string "\\.cc$" ".h"  (buffer-file-name)))
+         ((string-match-p "\\.cpp$" (buffer-file-name))
+          (replace-regexp-in-string "\\.cpp$" ".h"  (buffer-file-name)))
          ((string-match-p "\\.h$" (buffer-file-name))
           (replace-regexp-in-string "\\.h$" ".cc" (buffer-file-name)))
          (t (error "Not a .cc or .h file: %s" (buffer-file-name))))))
@@ -614,16 +619,57 @@ Otherwise transpose sexps."
           ("WAITING" . (:foreground "yellow"))
           ("CANCELLED" . (:foreground "blue" :weight bold)))))
 
+;;; This code clocks in whenever a task is started, and clocks out whenever
+;;; the task is waiting. Also automatically start task if clocks in.
+(eval-after-load 'org
+  '(progn
+     (defun wicked/org-clock-in-if-starting ()
+       "Clock in when the task is marked STARTED."
+       (when (and (string= state "STARTED")
+                  (not (string= last-state state)))
+         (org-clock-in)))
+     (add-hook 'org-after-todo-state-change-hook
+               'wicked/org-clock-in-if-starting)
+     (defadvice org-clock-in (after wicked activate)
+       "Set this task's status to 'STARTED'."
+       (org-todo "STARTED"))
+     (defun wicked/org-clock-out-if-waiting ()
+       "Clock out when the task is marked WAITING."
+       (when (and (string= state "WAITING")
+                  (equal (marker-buffer org-clock-marker) (current-buffer))
+                  (< (point) org-clock-marker)
+                  (> (save-excursion (outline-next-heading) (point))
+                     org-clock-marker)
+                  (not (string= last-state state)))
+         (org-clock-out)))
+     (add-hook 'org-after-todo-state-change-hook
+               'wicked/org-clock-out-if-waiting)))
 
 ;;; ======================= Go Mode ======================== ;;;
 
 ;;; Copy GOPATH
-(exec-path-from-shell-copy-env "GOPATH")
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH"))
+;; TODO: parse GOPATH and populate PATH with entries
+(setenv "PATH" (concat (getenv "PATH") ":/Users/chao/go/bin"))
+(setq exec-path (cons "/Users/chao/go/bin" exec-path))
+
+
 (defun my-go-mode-hook ()
   (whitespace-mode -1) ; don't highlight hard tabs
   (local-set-key (kbd "M-.") 'godef-jump)
   (auto-complete-mode 1)
   (add-hook 'before-save-hook 'gofmt-before-save)
+  (if (not (string-match "go" compile-command))
+    (set (make-local-variable 'compile-command)
+      "go generate && go build -v && go test -v && go vet"))
+  ; Go oracle
+  (load-file "$HOME/go/src/golang.org/x/tools/cmd/oracle/oracle.el")
+  ; Godef jump key binding
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "C-c C-k") 'godoc)
+
   (setq
    gofmt-command "goimports"
    tab-width 2         ; display tabs as two-spaces
@@ -633,36 +679,55 @@ Otherwise transpose sexps."
 
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
+(require 'go-autocomplete)
+(require 'auto-complete-config)
+(ac-config-default)
+
 ;; Set up go-eldoc.el with gocode for auto-completion and documentation.
 (require 'go-eldoc)
 (add-hook 'go-mode-hook 'go-eldoc-setup)
 
 ;; Set up autocomplete for Go and bind the force completion to control+tab.
-(require 'go-autocomplete)
-(require 'auto-complete-config)
 (define-key ac-mode-map (kbd "C-TAB") 'auto-complete)
 
+(add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
+(require 'go-flymake)
+(require 'go-flycheck)
 
-;; (defun my-go-mode-hook ()
-;;   ; Use goimports instead of go-fmt
-;;   ; (setq gofmt-command "goimports")
-;;   ; Call Gofmt before saving
-;;   (add-hook 'before-save-hook 'gofmt-before-save)
-;;   ; Customize compile command to run go build
-;;   (if (not (string-match "go" compile-command))
-;;       (set (make-local-variable 'compile-command)
-;;            "go generate && go build -v && go test -v && go vet"))
-;;   ; Go oracle
-;;   (load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
-;;   ; Godef jump key binding
-;;   (local-set-key (kbd "M-.") 'godef-jump)
-;;   (local-set-key (kbd "C-c C-k") 'godoc))
-;; (add-hook 'go-mode-hook 'my-go-mode-hook)
-;; (add-hook 'go-mode-hook 'company-mode)
-;; (add-hook 'go-mode-hook (lambda ()
-;;   (set (make-local-variable 'company-backends) '(company-go))
-;;   (company-mode)))
 
+;;; ======================= Rust Mode ======================== ;;;
+(require 'rust-mode)
+(require 'racer)
+(require 'flymake-rust)
+(require 'flycheck-rust)
+(require 'rustfmt)
+
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+
+(setq
+ racer-cmd "/Users/chao/.cargo/bin/racer"
+ racer-rust-src-path "/Users/chao/src/rustc-1.10.0/src"
+ racer-cargo-home "/Users/chao/.cargo"
+ company-tooltip-align-annotations t)
+
+(add-hook 'racer-mode-hook
+          '(lambda ()
+             (eldoc-mode)
+             (company-mode)))
+
+(add-hook 'rust-mode-hook
+          '(lambda ()
+             (racer-mode)
+             (flymake-rust-load)
+             (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+             (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
+             (rustfmt-enable-on-save)))
+
+;;; ======================= XML mode =============================== ;;;
+(setq
+  nxml-child-indent 4
+  nxml-attribute-indent 4
+  nxml-slash-auto-complete-flag t)
 
 ;;; =================== My customized functions ==================== ;;;
 
