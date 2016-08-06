@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Aug  6 12:33:49 2016.
+;;; Last Modified: Sat Aug  6 12:38:50 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -353,7 +353,9 @@ Otherwise transpose sexps."
    '(magit-blame-name ((t (:foreground "#b1951d" :background nil))))
    '(magit-blame-summary ((t (:foreground "#b1951d" :background nil))))
    '(magit-blame-hash ((t (:foreground "#bc6ec5" :background nil))))
-   '(magit-blame-heading ((t (:foreground "#67b11d" :background nil)))))
+   '(magit-blame-heading ((t (:foreground "#67b11d" :background nil))))
+   '(magit-branch-current ((t (:inherit bold :foreground "#4f97d7" :background nil :box 1))))
+   '(magit-branch-local ((t (:inherit bold :foreground "#4f97d7" :background nil)))))
 
 
 ;;; Keybindings
