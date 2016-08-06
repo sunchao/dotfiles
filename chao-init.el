@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Aug  6 11:18:38 2016.
+;;; Last Modified: Sat Aug  6 12:27:16 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -64,13 +64,16 @@
 (setq display-time-day-and-date t) ;; display stuff
 (setq global-font-lock-mode t) ;; enable font lock mode on all
 (setq inhibit-startup-msg t) ;; disable startup message
-(setq-default show-trailing-whitespace -1)
+(setq-default show-trailing-whitespace t)
 (scroll-bar-mode -1) ;; don't need scroll bar
 (setq whitespace-style
       '(trailing lines space-before-tab
                  indentation space-after-tab))
 ;; backup files in a separate dir
 (setq backup-directory-alist `(("." . "~/.emacs_backup_files")))
+
+;; Smoother scrolling
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 
 ;; Wind Move
 (windmove-default-keybindings 'meta)
@@ -301,6 +304,18 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-x a t") 'query-replace-word-under-cursor)
 (global-set-key (kbd "C-x 4") 'split-3-windows)
 
+;;; ============================== Emacs Lisp Mode =============================
+;;; ============================================================================
+
+(add-hook 'emacs-lisp-mode-hook
+    (lambda ()
+      ;; Use spaces not tabs
+      (setq indent-tabs-mode nil)
+      (define-key flyspell-mode-map "\M-\t" nil)
+      (define-key emacs-lisp-mode-map
+        "\C-x\C-e" 'pp-eval-last-sexp)
+))
+(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 
 ;;; ================================= Term Mode ================================
 ;;; ============================================================================
@@ -310,7 +325,6 @@ Otherwise transpose sexps."
   (lambda ()
     (progn
       (setq show-trailing-whitespace nil))))
-
 
 ;;; ================================ Magit Mode ================================
 ;;; ============================================================================
@@ -325,10 +339,23 @@ Otherwise transpose sexps."
   (face-remap-add-relative 'magit-section-highlight '()))
 (add-hook 'magit-status-mode-hook 'disable-magit-highlight-in-buffer)
 
+;; Customize diff color (for dark background)
+(custom-set-faces
+   '(magit-diff-added ((t (:foreground "lime green"))))
+   '(magit-diff-added-highlight ((t (:foreground "lime green"))))
+   '(magit-diff-base-highlight ((t (:foreground "#eeeebb"))))
+   '(magit-diff-removed ((t (:foreground "red"))))
+   '(magit-diff-removed-highlight ((t (:foreground "red"))))
+   '(magit-diff-hunk-heading
+     ((t (:foreground "#9a9aba" :background nil))))
+   '(magit-diff-hunk-heading-highlight
+     ((t (:foreground "#9a9aba" :background nil)))))
+
+
 ;;; Keybindings
-(global-set-key (kbd "C-x n s") 'magit-status)
-(global-set-key (kbd "C-x n b") 'magit-blame-mode)
-(global-set-key (kbd "C-x n l") 'magit-file-log)
+(global-set-key (kbd "C-x g s") 'magit-status)
+(global-set-key (kbd "C-x g b") 'magit-blame-mode)
+(global-set-key (kbd "C-x g l") 'magit-file-log)
 (global-set-key (kbd "C-c C-k") 'my-transpose-sexps)
 
 ;;; =============================== Paredit Mode ===============================
@@ -624,8 +651,8 @@ Otherwise transpose sexps."
   '(progn
      (defun wicked/org-clock-in-if-starting ()
        "Clock in when the task is marked STARTED."
-       (when (and (string= state "STARTED")
-                  (not (string= last-state state)))
+       (when (and (string= org-state "STARTED")
+                  (not (string= org-last-state state)))
          (org-clock-in)))
      (add-hook 'org-after-todo-state-change-hook
                'wicked/org-clock-in-if-starting)
@@ -634,12 +661,12 @@ Otherwise transpose sexps."
        (org-todo "STARTED"))
      (defun wicked/org-clock-out-if-waiting ()
        "Clock out when the task is marked WAITING."
-       (when (and (string= state "WAITING")
+       (when (and (string= org-state "WAITING")
                   (equal (marker-buffer org-clock-marker) (current-buffer))
                   (< (point) org-clock-marker)
                   (> (save-excursion (outline-next-heading) (point))
                      org-clock-marker)
-                  (not (string= last-state state)))
+                  (not (string= org-last-state org-state)))
          (org-clock-out)))
      (add-hook 'org-after-todo-state-change-hook
                'wicked/org-clock-out-if-waiting)))
@@ -811,6 +838,7 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
 (global-set-key (kbd "C-x a u") 'uncomment-region)
 (global-set-key (kbd "C-x a d") 'delete-trailing-whitespace)
 (global-set-key (kbd "C-x a r") 'align-regexp)
+(global-set-key (kbd "C-x a f") 'recentf-open-files)
 
 
 ;;; ============================= THE END ======================================
