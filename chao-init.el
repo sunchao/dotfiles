@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Wed Jul 27 18:54:16 2016.
+;;; Last Modified: Sat Aug  6 11:18:38 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -64,14 +64,13 @@
 (setq display-time-day-and-date t) ;; display stuff
 (setq global-font-lock-mode t) ;; enable font lock mode on all
 (setq inhibit-startup-msg t) ;; disable startup message
-(setq make-backup-files -1)
 (setq-default show-trailing-whitespace -1)
-;; (setq-default fill-column 90) ;; 70 -> 90
 (scroll-bar-mode -1) ;; don't need scroll bar
-(setq whitespace-style '(trailing lines space-before-tab
-                                  indentation space-after-tab))
-;; Save session when exiting Emacs.
-; (desktop-save-mode 1)
+(setq whitespace-style
+      '(trailing lines space-before-tab
+                 indentation space-after-tab))
+;; backup files in a separate dir
+(setq backup-directory-alist `(("." . "~/.emacs_backup_files")))
 
 ;; Wind Move
 (windmove-default-keybindings 'meta)
@@ -654,7 +653,6 @@ Otherwise transpose sexps."
 ;; TODO: parse GOPATH and populate PATH with entries
 (setenv "PATH" (concat (getenv "PATH") ":/Users/chao/go/bin"))
 (setq exec-path (cons "/Users/chao/go/bin" exec-path))
-
 
 (defun my-go-mode-hook ()
   (whitespace-mode -1) ; don't highlight hard tabs
