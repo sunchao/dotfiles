@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Aug  6 12:38:50 2016.
+;;; Last Modified: Sat Aug  6 12:42:16 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -658,7 +658,7 @@ Otherwise transpose sexps."
      (defun wicked/org-clock-in-if-starting ()
        "Clock in when the task is marked STARTED."
        (when (and (string= org-state "STARTED")
-                  (not (string= org-last-state state)))
+                  (not (string= org-last-state org-state)))
          (org-clock-in)))
      (add-hook 'org-after-todo-state-change-hook
                'wicked/org-clock-in-if-starting)
