@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Aug  6 14:46:05 2016.
+;;; Last Modified: Mon Aug  8 22:28:17 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -359,11 +359,10 @@ Otherwise transpose sexps."
 
 
 ;;; Keybindings
-(global-set-key (kbd "C-x g s") 'magit-status)
-(global-set-key (kbd "C-x g b") 'magit-blame)
-(global-set-key (kbd "C-x g l") 'magit-file-log)
-(global-set-key (kbd "C-x g d") 'magit-diff)
-(global-set-key (kbd "C-c C-k") 'my-transpose-sexps)
+(global-set-key (kbd "C-c g s") 'magit-status)
+(global-set-key (kbd "C-c g b") 'magit-blame)
+(global-set-key (kbd "C-c g l") 'magit-file-log)
+(global-set-key (kbd "C-c g d") 'magit-diff)
 
 ;;; =============================== Paredit Mode ===============================
 ;;; ============================================================================
@@ -630,6 +629,15 @@ Otherwise transpose sexps."
 ;; Enable fontifying code blocks
 (setq org-src-fontify-natively t)
 
+;; todo keywords
+;; (setq org-todo-keywords
+;;       (quote ((sequence "TODO(t)" "STARTED(s)" "WAITING(w)"
+;;                         "DONE(d)" "CANCELLED(c)" "DEFERRED(f)"))))
+
+(setq org-capture-templates
+      (quote (("t" "todo" entry (file "~/org/notes.org")
+               "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t))))
+
 (add-hook
  'org-mode-hook
  (lambda ()
@@ -677,6 +685,17 @@ Otherwise transpose sexps."
          (org-clock-out)))
      (add-hook 'org-after-todo-state-change-hook
                'wicked/org-clock-out-if-waiting)))
+
+(defun my/quantified-get-hours (category time-summary)
+  "Return the number of hours based on the time summary."
+  (if (stringp category)
+      (if (assoc category time-summary) (/ (cdr (assoc category time-summary)) 3600.0) 0)
+    (apply '+ (mapcar (lambda (x) (my/quantified-get-hours x time-summary)) category))))
+
+;;; Key Bindings
+(global-set-key (kbd "C-c o c") 'org-clock-goto) ;; go to currently clock item
+(global-set-key (kbd "C-c o p") 'org-capture) ;; add a task for future
+
 
 ;;; ======================= Go Mode ======================== ;;;
 
@@ -841,11 +860,13 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
 (global-set-key (kbd "C-c C-r") 'query-replace-regexp)
 (global-set-key (kbd "C-c C-f") 'find-file-in-repository)
 (global-set-key (kbd "C-c C-g") 'ack)
+(global-set-key (kbd "C-c C-k") 'my-transpose-sexps)
 (global-set-key (kbd "C-x a c") 'comment-region)
 (global-set-key (kbd "C-x a u") 'uncomment-region)
 (global-set-key (kbd "C-x a d") 'delete-trailing-whitespace)
 (global-set-key (kbd "C-x a r") 'align-regexp)
 (global-set-key (kbd "C-x a f") 'recentf-open-files)
+
 
 
 ;;; ============================= THE END ======================================
