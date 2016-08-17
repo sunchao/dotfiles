@@ -33,8 +33,8 @@ values."
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
      ;; spell-checking
-     ;; syntax-checking
-     ;; version-control
+     syntax-checking
+     version-control
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -48,6 +48,7 @@ values."
      ggtags
      ack
      flymake
+     flycheck
      magit
 
      ;; Quickly locate file under git repo (with C-x C-f)
@@ -55,6 +56,10 @@ values."
 
      ;; Display a line at the column boundary
      fill-column-indicator
+
+     ;; Code completion
+     company
+     irony
 
      ;; For C++ dev
      cc-mode
@@ -74,15 +79,20 @@ values."
      go-rename
      go-dlv
 
-     ;; company
-     irony
+     ;; Rust dev
+     rust-mode
+     racer
+     flymake-rust
+     flycheck-rust
+     rustfmt
+     company-racer
      )
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '()
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
-   dotspacemacs-delete-orphan-packages t))
+   dotspacemacs-delete-orphan-packages nil))
 
 (defun dotspacemacs/init ()
   "Initialization function.
@@ -276,7 +286,9 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-  )
+  (setq-default
+   exec-path-from-shell-check-startup-files nil
+   ))
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -298,10 +310,27 @@ you should place your code here."
  '(custom-enabled-themes (quote (spacemacs-dark)))
  '(custom-safe-themes
    (quote
-    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default))))
+    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
+ '(magit-revision-show-gravatars (quote ("^Author:     " . "^Commit:     "))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(diff-added ((t (:foreground "#149914" :background nil :inherit nil))))
+ '(diff-removed ((t (:foreground "#991414" :background nil :inherit nil))))
+ '(magit-blame-hash ((t (:foreground "#bc6ec5"))))
+ '(magit-blame-heading ((t (:foreground "#67b11d"))))
+ '(magit-blame-name ((t (:foreground "#b1951d"))))
+ '(magit-blame-summary ((t (:foreground "#b1951d"))))
+ '(magit-branch-current ((t (:inherit bold :foreground "#4f97d7" :box 1))))
+ '(magit-branch-local ((t (:inherit bold :foreground "#4f97d7"))))
+ '(magit-diff-added ((t (:foreground "#ddffdd"))))
+ '(magit-diff-added-highlight ((t (:foreground "lime green"))))
+ '(magit-diff-base ((t (:foreground "#555522"))))
+ '(magit-diff-base-highlight ((t (:foreground "#eeeebb"))))
+ '(magit-diff-hunk-heading ((t (:foreground "#9a9aba"))))
+ '(magit-diff-hunk-heading-highlight ((t (:foreground "#9a9aba"))))
+ '(magit-diff-lines-heading ((t (:inherit magit-diff-hunk-heading-highlight :foreground "salmon4"))))
+ '(magit-diff-removed ((t (:foreground "red"))))
+ '(magit-diff-removed-highlight ((t (:foreground "firebrick3")))))
