@@ -33,7 +33,6 @@ set ignorecase
 set incsearch
 set autoread
 set autoindent
-set list
 set number
 set ruler
 set scrolloff=3
@@ -42,3 +41,8 @@ set showcmd
 set smartcase
 set softtabstop=2
 set tabstop=8
+set paste
+
+" Search visually selected text
+vnoremap // y/<C-R>"<CR>
+
