@@ -9,7 +9,6 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
-Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'git://github.com/sheerun/vim-polyglot.git'
 Plugin 'git://github.com/kien/ctrlp.vim.git'
@@ -19,7 +18,8 @@ filetype plugin indent on
 " Vundle END
 
 " Color Theme
-colorscheme onedark
+" colorscheme onedark
+colorscheme iceberg
 let g:airline_theme='onedark'
 
 " Enable search results highlight
@@ -46,3 +46,5 @@ set paste
 " Search visually selected text
 vnoremap // y/<C-R>"<CR>
 
+" Git commit message format
+au FileType gitcommit set tw=72

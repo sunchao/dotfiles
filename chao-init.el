@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Mon Aug  8 22:28:17 2016.
+;;; Last Modified: Sun Nov 13 15:13:19 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -8,10 +8,7 @@
 ;;; the built-in theme installer.
 
 ;; Default conf dir
-(defun emacs-conf-dir () (concat (getenv "HOME") "/.emacs.d"))
-
-(add-to-list 'load-path (emacs-conf-dir))
-(add-to-list 'custom-theme-load-path (concat (emacs-conf-dir) "/my-themes"))
+(defun emacs-conf-dir () (concat (getenv "HOME") "/git/dotfiles"))
 
 ;;; A short-cut to the init file
 (defun init-file ()
@@ -298,6 +295,20 @@ Otherwise transpose sexps."
       (re-search-forward "[,]\\s-*" nil t)
       (save-excursion
         (insert lhs)))))
+
+(defun window-half-height ()
+  (max 1 (/ (1- (window-height (selected-window))) 2)))
+
+(defun scroll-up-half ()
+  (interactive)
+  (scroll-up (window-half-height)))
+
+(defun scroll-down-half ()
+  (interactive)
+  (scroll-down (window-half-height)))
+
+(global-set-key (kbd "C-v") 'scroll-up-half)
+(global-set-key (kbd "M-v") 'scroll-down-half)
 
 ;;; Utility keybindings
 (global-set-key (kbd "C-c t") 'describe-function-in-popup)
@@ -756,8 +767,8 @@ Otherwise transpose sexps."
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
 (setq
- racer-cmd "/Users/chao/.cargo/bin/racer"
- racer-rust-src-path "/Users/chao/src/rustc-1.10.0/src"
+ racer-cmd "/Users/chao/bin/racer"
+ racer-rust-src-path "/Users/chao/src/rustc-1.11.0/src"
  racer-cargo-home "/Users/chao/.cargo"
  company-tooltip-align-annotations t)
 
@@ -779,6 +790,13 @@ Otherwise transpose sexps."
   nxml-child-indent 4
   nxml-attribute-indent 4
   nxml-slash-auto-complete-flag t)
+
+;;; ======================= Markdown mode ============================= ;;;
+
+(add-hook 'markdown-mode-hook
+         '(lambda ()
+            (setq-default fill-column 80)
+              (auto-fill-mode t)))
 
 ;;; =================== My customized functions ==================== ;;;
 
