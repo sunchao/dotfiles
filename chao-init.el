@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sun Nov 13 15:13:19 2016.
+;;; Last Modified: Fri Nov 25 12:15:23 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -296,19 +296,8 @@ Otherwise transpose sexps."
       (save-excursion
         (insert lhs)))))
 
-(defun window-half-height ()
-  (max 1 (/ (1- (window-height (selected-window))) 2)))
-
-(defun scroll-up-half ()
-  (interactive)
-  (scroll-up (window-half-height)))
-
-(defun scroll-down-half ()
-  (interactive)
-  (scroll-down (window-half-height)))
-
-(global-set-key (kbd "C-v") 'scroll-up-half)
-(global-set-key (kbd "M-v") 'scroll-down-half)
+(global-set-key (kbd "C-v") 'scroll-up-command)
+(global-set-key (kbd "M-v") 'scroll-down-command)
 
 ;;; Utility keybindings
 (global-set-key (kbd "C-c t") 'describe-function-in-popup)
