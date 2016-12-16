@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Fri Nov 25 12:15:23 2016.
+;;; Last Modified: Thu Dec 15 23:31:35 2016.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -760,6 +760,8 @@ Otherwise transpose sexps."
  racer-rust-src-path "/Users/chao/src/rustc-1.11.0/src"
  racer-cargo-home "/Users/chao/.cargo"
  company-tooltip-align-annotations t)
+
+(setq rust-indent-offset 2)
 
 (add-hook 'racer-mode-hook
           '(lambda ()
