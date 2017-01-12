@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Mon Dec 26 22:42:18 2016.
+;;; Last Modified: Thu Jan 12 14:34:31 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
