@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Thu Jan 12 14:34:31 2017.
+;;; Last Modified: Fri Mar  3 10:02:05 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -18,8 +18,8 @@
 ;;; Disable the undo-tree mode
 (global-undo-tree-mode 0)
 
-;;; ====================== A bunch of config setups ============================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; A bunch of config setups
 
 (require 'cl)
 ;; (global-flycheck-mode)
@@ -90,8 +90,8 @@
 (setq left-fringe-width 0)
 (setq right-fringe-width 0)
 
-;;; ======================== Utility Functions =================================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Utility Functions
 
 (defun copy-lines-matching-re (re)
   "find all lines matching the regexp RE in the current buffer
@@ -315,8 +315,8 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-x a t") 'query-replace-word-under-cursor)
 (global-set-key (kbd "C-x 4") 'split-3-windows)
 
-;;; ============================== Emacs Lisp Mode =============================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Emacs Lisp Mode
 
 (add-hook 'emacs-lisp-mode-hook
     (lambda ()
@@ -328,8 +328,9 @@ Otherwise transpose sexps."
 ))
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 
-;;; ================================= Term Mode ================================
-;;; ============================================================================
+
+;;; --------------------------------------------------------------------------------
+;;; Term Mode
 
 ;; Don't want trailing whitespace for term
 (add-hook 'term-mode-hook
@@ -337,8 +338,9 @@ Otherwise transpose sexps."
     (progn
       (setq show-trailing-whitespace nil))))
 
-;;; ================================ Magit Mode ================================
-;;; ============================================================================
+
+;;; --------------------------------------------------------------------------------
+;;; Magit Mode
 
 ;;; To prevent Magit from reverting all unmodified buffer
 ;;; TODO: is this still necessary
@@ -375,23 +377,25 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-c g l") 'magit-file-log)
 (global-set-key (kbd "C-c g d") 'magit-diff)
 
-;;; =============================== Paredit Mode ===============================
-;;; ============================================================================
+
+;;; --------------------------------------------------------------------------------
+;;; Paredit Mode
 
 (autoload 'enable-paredit-mode "paredit" t)
 (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
 
 
-;;; ================================= IDO Mode =================================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; IDO Mode
 
 ;;; TODO: consider Helm mode as a replacement
 (ido-mode t)
+(global-set-key (kbd "C-x C-f") 'ido-find-file)
 (setq ido-enable-flex-matching nil) ;; enable fuzzy matching
 
 
-;;; ================================= SML Mode =================================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; SML Mode
 
 (defun my-sml-mode-hook () "Local defaults for SML mode"
   (setq sml-indent-level 2)        ; conserve on horizontal space
@@ -400,9 +404,8 @@ Otherwise transpose sexps."
 (add-hook 'sml-mode-hook 'my-sml-mode-hook)
 
 
-;; =============================================================================
-;; ================================ GGtags =====================================
-;; =============================================================================
+;;; --------------------------------------------------------------------------------
+;;; GGtags
 
 (autoload 'gtags-mode "gtags" "" t)
 (require 'ggtags) ;; See https://github.com/leoliu/ggtags
@@ -426,8 +429,8 @@ Otherwise transpose sexps."
 ;; (add-hook 'after-save-hook #'gtags-update-hook)
 
 
-;; ================================ Irony Mode =================================
-;; =============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Irony Mode
 
 (require 'irony)
 
@@ -451,8 +454,8 @@ Otherwise transpose sexps."
 (add-hook 'c-mode-hook 'irony-mode)
 
 
-;; ================================ Company Mode ===============================
-;; =============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Company Mode
 
 ;; Company mode
 (require 'company)
@@ -468,8 +471,8 @@ Otherwise transpose sexps."
 ;; (add-hook 'c++-mode-hook 'company-mode)
 ;; (add-hook 'c-mode-hook 'company-mode)
 
-;;; ================================= C++ Mode =================================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; C++ Mode
 
 (require 'cc-mode) ;; C++ mode
 (require 'flymake) ;; Syntax checking on the fly
@@ -529,23 +532,25 @@ Otherwise transpose sexps."
 (global-set-key (kbd "M-p") 'switch-to-header-or-impl)
 
 
-;;; ================================= Java Mode ================================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Java Mode
 
 (add-hook 'java-mode-hook '(lambda () (setq c-basic-offset 2)))
 (add-hook 'java-mode-hook '(lambda () (setq fill-column 90)))
 (add-hook 'java-mode-hook 'turn-on-auto-fill)
 
-;;; ================================= Python Mode ==============================
-;;; ============================================================================
+
+;;; --------------------------------------------------------------------------------
+;;; Python Mode
 
 (add-hook 'python-mode-hook
           (lambda ()
             (setq tab-width 2)
             (setq python-indent 2)))
 
-;;; ================================= Ruby Mode ==============================
-;;; ============================================================================
+
+;;; --------------------------------------------------------------------------------
+;;; Ruby Mode
 
 (defun my-ruby-compile()
   "Compile Ruby program"
@@ -558,8 +563,8 @@ Otherwise transpose sexps."
 (add-hook 'ruby-mode-hook '(lambda () (setq fill-column 80)))
 
 
-;;; ================================= Bash Mode ================================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Bash Mode
 
 (defun my-sh-mode-hook ()
   "Change indentation space"
@@ -569,8 +574,8 @@ Otherwise transpose sexps."
 (add-hook 'sh-mode-hook 'my-sh-mode-hook)
 
 
-;;; ================================= Latex Mode ===============================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Latex Mode
 
 ;; load AUCTEX mode
 ;; (load "auctex.el" nil t t)
@@ -590,8 +595,8 @@ Otherwise transpose sexps."
 (setq-default TeX-master "main")	;; make AUCTEX aware of the default
 
 
-;;; ================================= Twelf Mode ===============================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Twelf Mode
 
 (cond
  ((file-exists-p "/usr/local/twelf/emacs/twelf-init.el")
@@ -611,8 +616,9 @@ Otherwise transpose sexps."
        (auto-fill-mode))) ;; auto wrap lines
    )))
 
-;;; =============================== Org Mode ===================================
-;;; ============================================================================
+
+;;; --------------------------------------------------------------------------------
+;;; Org Mode
 
 (require 'org-install)
 (require 'ob-tangle)
@@ -708,7 +714,8 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-c o p") 'org-capture) ;; add a task for future
 
 
-;;; ======================= Go Mode ======================== ;;;
+;;; --------------------------------------------------------------------------------
+;;; Go Mode
 
 ;;; Copy GOPATH
 (when (memq window-system '(mac ns))
@@ -757,7 +764,9 @@ Otherwise transpose sexps."
 (require 'go-flycheck)
 
 
-;;; ======================= Rust Mode ======================== ;;;
+;;; --------------------------------------------------------------------------------
+;;; Rust Mode
+
 (require 'rust-mode)
 (require 'racer)
 (require 'flymake-rust)
@@ -785,36 +794,38 @@ Otherwise transpose sexps."
              (racer-mode)
              (flymake-rust-load)
              (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-             (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
-             (rustfmt-enable-on-save)))
+             (local-set-key (kbd "TAB") #'company-indent-or-complete-common)))
 
-;;; ======================= XML mode =============================== ;;;
+
+;;; --------------------------------------------------------------------------------
+;;; XML Mode
+
 (setq
   nxml-child-indent 4
   nxml-attribute-indent 4
   nxml-slash-auto-complete-flag t)
 
-;;; ======================= Markdown mode ============================= ;;;
+
+;;; --------------------------------------------------------------------------------
+;;; Markdown Mode
 
 (add-hook 'markdown-mode-hook
          '(lambda ()
             (setq-default fill-column 80)
               (auto-fill-mode t)))
 
-;;; =================== My customized functions ==================== ;;;
+
+;;; --------------------------------------------------------------------------------
+;;; Customized Functions
 
 ;;; Quickly find my GTD file
 (defun gtd ()
   (interactive)
   (find-file (concat (getenv "HOME") "/Dropbox/org/gtd.org")))
 
-;;; I found that, often given a Hive JIRA number, I need to create a corresponding URL
-;;; link to it.
-
 (defun create-jira-link ()
   ;;; TODO: implement this!
-  (interactive "r\JIRA #: ")
-  )
+  (interactive "r\JIRA #: "))
 
 ;; Load SQL source code blocks
 (org-babel-do-load-languages
@@ -872,8 +883,8 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
 (global-set-key "\C-cb" 'org-iswitchb)
 
 
-;;; ============================ Key Bindings ==================================
-;;; ============================================================================
+;;; --------------------------------------------------------------------------------
+;;; Key Bindings
 
 (require 'find-file-in-repository)
 
@@ -889,5 +900,4 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
 (global-set-key (kbd "C-x a f") 'recentf-open-files)
 
 
-
-;;; ============================= THE END ======================================
+;;; --------------------------------- THE END --------------------------------------
