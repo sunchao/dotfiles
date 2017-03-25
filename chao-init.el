@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Fri Mar  3 10:02:05 2017.
+;;; Last Modified: Fri Mar 24 22:34:25 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -126,7 +126,7 @@ putting the matching lines in a buffer named *matching*"
 
 (defun delete-first-n (begin end &optional n)
   "For all lines in the region, delete first n characters"
-  (interactive "r\nNHow many: ")
+  (interactive "r\nNHow many to delete: ")
   (or n (setq n 2))
   (let ((number-of-lines
          (save-excursion
@@ -149,11 +149,10 @@ putting the matching lines in a buffer named *matching*"
         (setq number-of-lines (1- number-of-lines))
         (forward-line)))))
 
-(defun make-spaces (begin end &optional n)
-  "For all lines in the region, add n spaces before each line.\n
-  In default, add 2 spaces"
-  (interactive "r\nNHow many spaces to add ")
-  (or n (setq n 2))
+(defun insert-first-n (begin end &optional n)
+  "For all lines in the region, insert n spaces before each line.\n
+   In default, add 2 spaces"
+  (interactive "r\nNHow many spaces to add: ")
   (let ((nlines
          (save-excursion
            (goto-char begin)
@@ -162,11 +161,10 @@ putting the matching lines in a buffer named *matching*"
                (forward-line)
              (setq count (1+ count)))
              count))))
-    (while (> nlines 0)
-      (beginning-of-line)
-      (save-excursion
-        (goto-char begin)
-        (insert-char `?\ ' n t)
+    (save-excursion
+      (goto-char begin)
+      (while (> nlines 0)
+        (insert-char ?\s n t)
         (setq nlines (1- nlines))
         (forward-line)))))
 
@@ -778,7 +776,6 @@ Otherwise transpose sexps."
 
 (setq
  racer-cmd "/Users/chao/.cargo/bin/racer"
- racer-rust-src-path "/Users/chao/git/rust/src"
  racer-cargo-home "/Users/chao/.cargo"
  company-tooltip-align-annotations t)
 
