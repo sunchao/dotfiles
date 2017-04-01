@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Apr  1 15:34:33 2017.
+;;; Last Modified: Sat Apr  1 15:39:04 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -362,7 +362,7 @@ Otherwise transpose sexps."
 ;;; Keybindings
 (global-set-key (kbd "C-c g s") 'magit-status)
 (global-set-key (kbd "C-c g b") 'magit-blame)
-(global-set-key (kbd "C-c g l") 'magit-file-log)
+(global-set-key (kbd "C-c g l") 'magit-log-buffer-file)
 (global-set-key (kbd "C-c g d") 'magit-diff)
 
 
