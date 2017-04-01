@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Fri Mar 24 22:34:25 2017.
+;;; Last Modified: Sat Apr  1 15:34:33 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -315,16 +315,6 @@ Otherwise transpose sexps."
 
 ;;; --------------------------------------------------------------------------------
 ;;; Emacs Lisp Mode
-
-(add-hook 'emacs-lisp-mode-hook
-    (lambda ()
-      ;; Use spaces not tabs
-      (setq indent-tabs-mode nil)
-      (define-key flyspell-mode-map "\M-\t" nil)
-      (define-key emacs-lisp-mode-map
-        "\C-x\C-e" 'pp-eval-last-sexp)
-))
-(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 
 
 ;;; --------------------------------------------------------------------------------

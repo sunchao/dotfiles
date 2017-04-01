@@ -19,7 +19,7 @@ filetype plugin indent on
 
 " Color Theme
 " colorscheme onedark
-colorscheme iceberg
+colorscheme koe
 let g:airline_theme='onedark'
 
 " Enable search results highlight
