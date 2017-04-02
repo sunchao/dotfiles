@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Apr  1 15:41:33 2017.
+;;; Last Modified: Sat Apr  1 21:33:08 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -316,6 +316,12 @@ Otherwise transpose sexps."
 ;;; --------------------------------------------------------------------------------
 ;;; Emacs Lisp Mode
 
+
+;;; --------------------------------------------------------------------------------
+;;; Text Mode
+(add-hook 'text-mode-hook
+          (lambda ()
+            (setq fill-column 72)))
 
 ;;; --------------------------------------------------------------------------------
 ;;; Term Mode
@@ -783,9 +789,14 @@ Otherwise transpose sexps."
              (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
              (local-set-key (kbd "TAB") #'company-indent-or-complete-common)))
 
+(defun my-cargo-run-bin (cmd)
+    (interactive "MThe binary to run: ")
+    (cargo-process-run-bin cmd))
+
 (global-set-key (kbd "C-c r b") 'cargo-process-build)
 (global-set-key (kbd "C-c r t") 'cargo-process-test)
 (global-set-key (kbd "C-c r r") 'cargo-process-run)
+(global-set-key (kbd "C-c r w") 'my-cargo-run-bin)
 
 
 ;;; --------------------------------------------------------------------------------
