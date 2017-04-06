@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Apr  1 21:33:08 2017.
+;;; Last Modified: Wed Apr  5 21:36:44 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -370,6 +370,7 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-c g b") 'magit-blame)
 (global-set-key (kbd "C-c g l") 'magit-log-buffer-file)
 (global-set-key (kbd "C-c g d") 'magit-diff)
+(global-set-key (kbd "C-c g f") 'magit-stage-file)
 
 
 ;;; --------------------------------------------------------------------------------
@@ -793,10 +794,16 @@ Otherwise transpose sexps."
     (interactive "MThe binary to run: ")
     (cargo-process-run-bin cmd))
 
-(global-set-key (kbd "C-c r b") 'cargo-process-build)
-(global-set-key (kbd "C-c r t") 'cargo-process-test)
-(global-set-key (kbd "C-c r r") 'cargo-process-run)
-(global-set-key (kbd "C-c r w") 'my-cargo-run-bin)
+(eval-after-load 'rust-mode
+  (lambda ()
+    (define-key rust-mode-map (kbd "C-c r n") 'flycheck-next-error)
+    (define-key rust-mode-map (kbd "C-c r p") 'flycheck-previous-error)
+    (define-key rust-mode-map (kbd "C-c r b") 'cargo-process-build)
+    (define-key rust-mode-map (kbd "C-c r t") 'cargo-process-test)
+    (define-key rust-mode-map (kbd "C-c r r") 'cargo-process-run)
+    (define-key rust-mode-map (kbd "C-c r w") 'my-cargo-run-bin)))
+
+
 
 
 ;;; --------------------------------------------------------------------------------
