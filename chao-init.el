@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Wed Apr  5 21:36:44 2017.
+;;; Last Modified: Fri Jun  2 23:17:08 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -312,6 +312,7 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-c t") 'describe-function-in-popup)
 (global-set-key (kbd "C-x a t") 'query-replace-word-under-cursor)
 (global-set-key (kbd "C-x 4") 'split-3-windows)
+
 
 ;;; --------------------------------------------------------------------------------
 ;;; Emacs Lisp Mode
@@ -668,7 +669,7 @@ Otherwise transpose sexps."
   (setq org-todo-keyword-faces
         '(("TODO" . org-warning)
           ("DONE" . (:foreground "orange"))
-          ("STARTED" . (:foreground "gold"))
+          ("STARTED" . (:foreground "darkgreen"))
           ("WAITING" . (:foreground "yellow"))
           ("CANCELLED" . (:foreground "blue" :weight bold)))))
 
@@ -703,6 +704,23 @@ Otherwise transpose sexps."
   (if (stringp category)
       (if (assoc category time-summary) (/ (cdr (assoc category time-summary)) 3600.0) 0)
     (apply '+ (mapcar (lambda (x) (my/quantified-get-hours x time-summary)) category))))
+
+(setq org-agenda-custom-commands
+      (quote
+       (("w" "Work related items"
+         (
+          (tags "@WORK"
+                ((org-agenda-overriding-header "Next Work Items")
+                 (org-agenda-skip-function
+                  '(org-agenda-skip-entry-if 'todo 'done)
+                  )
+                 (org-agenda-sorting-strategy '(priority-down))))
+          (tags "@WORK+TODO=\"POSTPONED\""
+                ((org-agenda-overriding-header "Deferred Work Items")
+                 (org-agenda-sorting-strategy '(priority-down)))))
+         )
+        )
+       ))
 
 ;;; Key Bindings
 (global-set-key (kbd "C-c o c") 'org-clock-goto) ;; go to currently clock item
@@ -796,16 +814,19 @@ Otherwise transpose sexps."
 
 (eval-after-load 'rust-mode
   (lambda ()
-    (define-key rust-mode-map (kbd "C-c r n") 'flycheck-next-error)
-    (define-key rust-mode-map (kbd "C-c r p") 'flycheck-previous-error)
+    (define-key rust-mode-map (kbd "C-q n") 'flycheck-next-error)
+    (define-key rust-mode-map (kbd "C-q p") 'flycheck-previous-error)
     (define-key rust-mode-map (kbd "C-c r b") 'cargo-process-build)
     (define-key rust-mode-map (kbd "C-c r t") 'cargo-process-test)
     (define-key rust-mode-map (kbd "C-c r r") 'cargo-process-run)
     (define-key rust-mode-map (kbd "C-c r w") 'my-cargo-run-bin)))
 
 
-
-
+;;; --------------------------------------------------------------------------------
+;;; Haskell Mode
+(add-hook 'haskell-mode-hook #'hindent-mode)
+(eval-after-load 'haskell-mode
+  '(define-key haskell-mode-map (kbd "M-8") 'haskell-navigate-imports))
 ;;; --------------------------------------------------------------------------------
 ;;; XML Mode
 
