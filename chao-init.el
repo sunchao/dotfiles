@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Dec  2 23:28:37 2017.
+;;; Last Modified: Sun Dec  3 10:21:25 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -760,7 +760,6 @@ Otherwise transpose sexps."
 (require 'racer)
 (require 'flycheck)
 (require 'flycheck-rust)
-(require 'rustfmt)
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
@@ -836,11 +835,6 @@ Otherwise transpose sexps."
   ;;; TODO: implement this!
   (interactive "r\JIRA #: "))
 
-;; Load SQL source code blocks
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((sql . t)))
-
 ;; If we want to create internal links in a org file, and show the
 ;; links on github, we need to create properties with
 ;; "CUSTOM_ID" of a particular format. For a header like "Foo Bar", we
@@ -872,16 +866,6 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
         (setq pairs (cons (list new old) pairs)))))
     (mapc (lambda (p) (princ (concat "\t- [[#" (car p) "][" (cadr p) "]]\n")
                         (current-buffer))) pairs)))
-
-(org-babel-do-load-languages ;; toggle language support
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (R . t)
-   (ruby . t)
-   (python . t)
-   (clojure . t)
-   (sh . t)
-   (latex . t)))
 
 (setq org-src-fontify-natively t) ;; fontify code block automatically
 
