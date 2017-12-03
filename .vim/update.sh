@@ -1,6 +1,7 @@
 #!/bin/bash
 
 repos=(
+  altercation/vim-colors-solarized
   itchyny/lightline.vim
   junegunn/fzf.vim
   mileszs/ack.vim
