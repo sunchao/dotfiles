@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Fri Jun  2 23:17:08 2017.
+;;; Last Modified: Sat Dec  2 23:28:37 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -18,7 +18,7 @@
 ;;; Disable the undo-tree mode
 (global-undo-tree-mode 0)
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; A bunch of config setups
 
 (require 'cl)
@@ -79,8 +79,8 @@
 
 ;; Add column indicator
 (require 'fill-column-indicator)
-;; (add-hook 'after-change-major-mode-hook 'fci-mode)
-;; (setq fci-rule-color "yellow")
+(add-hook 'after-change-major-mode-hook 'fci-mode)
+(setq fci-rule-color "gray")
 
 ;; give duplicated buffer name more information
 (require 'uniquify)
@@ -90,7 +90,7 @@
 (setq left-fringe-width 0)
 (setq right-fringe-width 0)
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Utility Functions
 
 (defun copy-lines-matching-re (re)
@@ -173,21 +173,6 @@ putting the matching lines in a buffer named *matching*"
   (interactive)
   (message "point is %d" (point)))
 
-(require 'popup)
-(defun describe-function-in-popup ()
-  "Describe Elisp function in a popup window."
-  (interactive)
-  (let ((desc (save-window-excursion
-                (describe-function (symbol-at-point))
-                (switch-to-buffer "*Help*")
-                (buffer-string))))
-    (popup-tip desc
-               :point (point)
-               :around t
-               :height 30
-               :scroll-bar t
-               :margin t)))
-
 (defun query-replace-word-under-cursor (replace-word)
   "Query-replace the world under the current cursor position."
   (interactive "sReplace current word with: ")
@@ -216,13 +201,23 @@ putting the matching lines in a buffer named *matching*"
   (let ((tostr (concat "Last Modified: " (current-time-string) ".")))
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward "\\Last Modified:\\([A-Za-z0-9: ]*\\)?\\." nil t)
+      (while (re-search-forward
+              "\\Last Modified:\\([A-Za-z0-9: ]*\\)?\\." nil t)
         (replace-match tostr nil t)))))
 
 (defun split-3-windows ()
   "Split the current window into 3 equal-size sub-windows.
    Quite useful for large monitor."
   (interactive)
+  (command-execute 'split-window-horizontally)
+  (command-execute 'split-window-horizontally)
+  (command-execute 'balance-windows))
+
+(defun split-4-windows ()
+  "Split the current window into 4 equal-size sub-windows.
+   Quite useful for large monitor."
+  (interactive)
+  (command-execute 'split-window-horizontally)
   (command-execute 'split-window-horizontally)
   (command-execute 'split-window-horizontally)
   (command-execute 'balance-windows))
@@ -309,22 +304,19 @@ Otherwise transpose sexps."
 (global-set-key (kbd "M-v") 'scroll-down-half)
 
 ;;; Utility keybindings
-(global-set-key (kbd "C-c t") 'describe-function-in-popup)
+;; (global-set-key (kbd "C-c t") 'describe-function-in-popup)
 (global-set-key (kbd "C-x a t") 'query-replace-word-under-cursor)
 (global-set-key (kbd "C-x 4") 'split-3-windows)
+(global-set-key (kbd "C-x 5") 'split-4-windows)
 
 
-;;; --------------------------------------------------------------------------------
-;;; Emacs Lisp Mode
-
-
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Text Mode
 (add-hook 'text-mode-hook
           (lambda ()
             (setq fill-column 72)))
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Term Mode
 
 ;; Don't want trailing whitespace for term
@@ -334,7 +326,7 @@ Otherwise transpose sexps."
       (setq show-trailing-whitespace nil))))
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Magit Mode
 
 ;;; To prevent Magit from reverting all unmodified buffer
@@ -362,8 +354,10 @@ Otherwise transpose sexps."
    '(magit-blame-summary ((t (:foreground "#b1951d" :background nil))))
    '(magit-blame-hash ((t (:foreground "#bc6ec5" :background nil))))
    '(magit-blame-heading ((t (:foreground "#67b11d" :background nil))))
-   '(magit-branch-current ((t (:inherit bold :foreground "#4f97d7" :background nil :box 1))))
-   '(magit-branch-local ((t (:inherit bold :foreground "#4f97d7" :background nil)))))
+   '(magit-branch-current
+     ((t (:inherit bold :foreground "#4f97d7" :background nil :box 1))))
+   '(magit-branch-local
+     ((t (:inherit bold :foreground "#4f97d7" :background nil)))))
 
 
 ;;; Keybindings
@@ -374,14 +368,14 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-c g f") 'magit-stage-file)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Paredit Mode
 
 (autoload 'enable-paredit-mode "paredit" t)
 (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; IDO Mode
 
 ;;; TODO: consider Helm mode as a replacement
@@ -390,7 +384,7 @@ Otherwise transpose sexps."
 (setq ido-enable-flex-matching nil) ;; enable fuzzy matching
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; SML Mode
 
 (defun my-sml-mode-hook () "Local defaults for SML mode"
@@ -400,7 +394,7 @@ Otherwise transpose sexps."
 (add-hook 'sml-mode-hook 'my-sml-mode-hook)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; GGtags
 
 (autoload 'gtags-mode "gtags" "" t)
@@ -420,12 +414,8 @@ Otherwise transpose sexps."
 (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
 (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
 
-;; gtags-update-hook is defined in csun-utils.el.
-;; This updates gtags upon saving file.
-;; (add-hook 'after-save-hook #'gtags-update-hook)
 
-
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Irony Mode
 
 (require 'irony)
@@ -450,7 +440,7 @@ Otherwise transpose sexps."
 (add-hook 'c-mode-hook 'irony-mode)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Company Mode
 
 ;; Company mode
@@ -467,7 +457,7 @@ Otherwise transpose sexps."
 ;; (add-hook 'c++-mode-hook 'company-mode)
 ;; (add-hook 'c-mode-hook 'company-mode)
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; C++ Mode
 
 (require 'cc-mode) ;; C++ mode
@@ -528,7 +518,7 @@ Otherwise transpose sexps."
 (global-set-key (kbd "M-p") 'switch-to-header-or-impl)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Java Mode
 
 (add-hook 'java-mode-hook '(lambda () (setq c-basic-offset 2)))
@@ -536,7 +526,7 @@ Otherwise transpose sexps."
 (add-hook 'java-mode-hook 'turn-on-auto-fill)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Python Mode
 
 (add-hook 'python-mode-hook
@@ -545,21 +535,7 @@ Otherwise transpose sexps."
             (setq python-indent 2)))
 
 
-;;; --------------------------------------------------------------------------------
-;;; Ruby Mode
-
-(defun my-ruby-compile()
-  "Compile Ruby program"
-  (interactive)
-  (compile (concat "ruby " (buffer-name))))
-
-(defun my-compile-ruby-keys ()
-  (local-set-key (kbd "C-c C-c") 'my-ruby-compile))
-(add-hook 'ruby-mode-hook 'my-compile-ruby-keys)
-(add-hook 'ruby-mode-hook '(lambda () (setq fill-column 80)))
-
-
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Bash Mode
 
 (defun my-sh-mode-hook ()
@@ -570,7 +546,7 @@ Otherwise transpose sexps."
 (add-hook 'sh-mode-hook 'my-sh-mode-hook)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Latex Mode
 
 ;; load AUCTEX mode
@@ -591,7 +567,7 @@ Otherwise transpose sexps."
 (setq-default TeX-master "main")	;; make AUCTEX aware of the default
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Twelf Mode
 
 (cond
@@ -613,7 +589,7 @@ Otherwise transpose sexps."
    )))
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Org Mode
 
 (require 'org-install)
@@ -727,7 +703,7 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-c o p") 'org-capture) ;; add a task for future
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Go Mode
 
 ;;; Copy GOPATH
@@ -777,12 +753,11 @@ Otherwise transpose sexps."
 (require 'go-flycheck)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Rust Mode
 
 (require 'rust-mode)
 (require 'racer)
-(require 'flymake-rust)
 (require 'flycheck)
 (require 'flycheck-rust)
 (require 'rustfmt)
@@ -794,8 +769,6 @@ Otherwise transpose sexps."
  racer-cargo-home "/Users/chao/.cargo"
  company-tooltip-align-annotations t)
 
-(setq rust-indent-offset 2)
-
 (add-hook 'racer-mode-hook
           '(lambda ()
              (eldoc-mode)
@@ -804,8 +777,11 @@ Otherwise transpose sexps."
 (add-hook 'rust-mode-hook
           '(lambda ()
              (racer-mode)
-             (flymake-rust-load)
              (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+             (setq fill-column 90)
+             (setq rust-indent-offset 2)
+             (setq company-minimum-prefix-length 2)
+             (setq cargo-process--enable-rust-backtrace 1)
              (local-set-key (kbd "TAB") #'company-indent-or-complete-common)))
 
 (defun my-cargo-run-bin (cmd)
@@ -818,16 +794,19 @@ Otherwise transpose sexps."
     (define-key rust-mode-map (kbd "C-q p") 'flycheck-previous-error)
     (define-key rust-mode-map (kbd "C-c r b") 'cargo-process-build)
     (define-key rust-mode-map (kbd "C-c r t") 'cargo-process-test)
+    (define-key rust-mode-map (kbd "C-c r g") 'cargo-process-current-test)
     (define-key rust-mode-map (kbd "C-c r r") 'cargo-process-run)
     (define-key rust-mode-map (kbd "C-c r w") 'my-cargo-run-bin)))
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Haskell Mode
 (add-hook 'haskell-mode-hook #'hindent-mode)
 (eval-after-load 'haskell-mode
   '(define-key haskell-mode-map (kbd "M-8") 'haskell-navigate-imports))
-;;; --------------------------------------------------------------------------------
+
+
+;;; ---------------------------------------------------------------------------
 ;;; XML Mode
 
 (setq
@@ -836,7 +815,7 @@ Otherwise transpose sexps."
   nxml-slash-auto-complete-flag t)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Markdown Mode
 
 (add-hook 'markdown-mode-hook
@@ -845,7 +824,7 @@ Otherwise transpose sexps."
               (auto-fill-mode t)))
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Customized Functions
 
 ;;; Quickly find my GTD file
@@ -913,7 +892,7 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
 (global-set-key "\C-cb" 'org-iswitchb)
 
 
-;;; --------------------------------------------------------------------------------
+;;; ---------------------------------------------------------------------------
 ;;; Key Bindings
 
 (require 'find-file-in-repository)
@@ -930,4 +909,4 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
 (global-set-key (kbd "C-x a f") 'recentf-open-files)
 
 
-;;; --------------------------------- THE END --------------------------------------
+;;; --------------------------------- THE END ---------------------------------
