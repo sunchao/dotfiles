@@ -1,1 +1,3 @@
 .emacs.d/elpa/*
+.vim/bundle/
+.vim/autoload/
