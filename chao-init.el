@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Mon Dec 11 10:11:53 2017.
+;;; Last Modified: Sun Dec 17 22:29:47 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -22,7 +22,7 @@
 ;;; A bunch of config setups
 
 (require 'cl)
-;; (global-flycheck-mode)
+(global-flycheck-mode)
 
 ;;; Set $PATH and exec-path from shell
 (exec-path-from-shell-initialize)
@@ -88,6 +88,11 @@
 
 (setq left-fringe-width 0)
 (setq right-fringe-width 0)
+
+;; Use ripgrep for searching
+(require 'rg)
+(require 'swiper)
+
 
 ;;; ---------------------------------------------------------------------------
 ;;; Utility Functions
@@ -763,8 +768,8 @@ Otherwise transpose sexps."
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
 (setq
- racer-cmd "/Users/chao/.cargo/bin/racer"
- racer-cargo-home "/Users/chao/.cargo"
+ racer-cmd (concat (getenv "HOME") "/.cargo/bin/racer")
+ racer-cargo-home (concat (getenv "HOME") "/.cargo")
  company-tooltip-align-annotations t)
 
 (add-hook 'racer-mode-hook
@@ -883,9 +888,10 @@ generate a id 'foo-bar'. Also, generate a list of links AFTER CURRENT POINT."
 
 (global-set-key (kbd "C-c C-v") 'compile)
 (global-set-key (kbd "C-c C-r") 'query-replace-regexp)
-(global-set-key (kbd "C-c C-f") 'find-file-in-repository)
-(global-set-key (kbd "C-c C-g") 'ack)
+(global-set-key (kbd "C-c C-f") 'counsel-git)
+(global-set-key (kbd "C-c C-o") 'counsel-locate)
 (global-set-key (kbd "C-c C-k") 'my-transpose-sexps)
+(global-set-key (kbd "C-c C-g") 'counsel-rg)
 (global-set-key (kbd "C-x a c") 'comment-region)
 (global-set-key (kbd "C-x a u") 'uncomment-region)
 (global-set-key (kbd "C-x a d") 'delete-trailing-whitespace)
