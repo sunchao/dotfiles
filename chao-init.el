@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sun Dec  3 10:21:25 2017.
+;;; Last Modified: Mon Dec 11 10:11:53 2017.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -79,7 +79,6 @@
 
 ;; Add column indicator
 (require 'fill-column-indicator)
-(add-hook 'after-change-major-mode-hook 'fci-mode)
 (setq fci-rule-color "gray")
 
 ;; give duplicated buffer name more information
@@ -531,8 +530,8 @@ Otherwise transpose sexps."
 
 (add-hook 'python-mode-hook
           (lambda ()
-            (setq tab-width 2)
-            (setq python-indent 2)))
+            (setq tab-width 4)
+            (setq python-indent 4)))
 
 
 ;;; ---------------------------------------------------------------------------
@@ -776,6 +775,7 @@ Otherwise transpose sexps."
 (add-hook 'rust-mode-hook
           '(lambda ()
              (racer-mode)
+             (fci-mode 1)
              (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
              (setq fill-column 90)
              (setq rust-indent-offset 2)
