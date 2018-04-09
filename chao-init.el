@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sat Jan  6 13:24:37 2018.
+;;; Last Modified: Sun Apr  8 23:24:46 2018.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -718,6 +718,18 @@ Otherwise transpose sexps."
 (setenv "PATH" (concat (getenv "PATH") ":/Users/chao/go/bin"))
 (setq exec-path (cons "/Users/chao/go/bin" exec-path))
 
+(require 'go-guru)
+
+(require 'go-autocomplete)
+(require 'auto-complete-config)
+(ac-config-default)
+
+;;; Helpful shortcuts
+;;; 1) C-M-a: beginning of defun
+;;; 2) C-M-e: end of defun
+;;; 3) M-.: jump to definition
+;;; 4) C-c C-d: describe definition
+
 (defun my-go-mode-hook ()
   (whitespace-mode -1) ; don't highlight hard tabs
   (local-set-key (kbd "M-.") 'godef-jump)
@@ -726,12 +738,13 @@ Otherwise transpose sexps."
   (if (not (string-match "go" compile-command))
     (set (make-local-variable 'compile-command)
       "go generate && go build -v && go test -v && go vet"))
-  ; Go oracle
-  (load-file "$HOME/go/src/golang.org/x/tools/cmd/oracle/oracle.el")
   ; Godef jump key binding
   (local-set-key (kbd "M-.") 'godef-jump)
   (local-set-key (kbd "C-c C-k") 'godoc)
-
+  (local-set-key (kbd "C-q n") 'flycheck-next-error)
+  (local-set-key (kbd "C-q p") 'flycheck-previous-error)
+  (local-set-key (kbd "C-x t") 'go-test-current-test)
+  (local-set-key (kbd "C-x f") 'go-test-current-file)
   (setq
    gofmt-command "goimports"
    tab-width 2         ; display tabs as two-spaces
@@ -741,20 +754,8 @@ Otherwise transpose sexps."
 
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
-(require 'go-autocomplete)
-(require 'auto-complete-config)
-(ac-config-default)
-
-;; Set up go-eldoc.el with gocode for auto-completion and documentation.
 (require 'go-eldoc)
 (add-hook 'go-mode-hook 'go-eldoc-setup)
-
-;; Set up autocomplete for Go and bind the force completion to control+tab.
-(define-key ac-mode-map (kbd "C-TAB") 'auto-complete)
-
-(add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
-(require 'go-flymake)
-(require 'go-flycheck)
 
 
 ;;; ---------------------------------------------------------------------------
