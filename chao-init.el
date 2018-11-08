@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sun Apr  8 23:24:46 2018.
+;;; Last Modified: Wed Nov  7 22:28:37 2018.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -773,6 +773,15 @@ Otherwise transpose sexps."
  racer-cargo-home (concat (getenv "HOME") "/.cargo")
  company-tooltip-align-annotations t)
 
+(defun get-rust-indent-offset ()
+  (let ((path (projectile-project-root)))
+    (cond
+     ((string-match "leveldb-rs" path) 2)
+     ((string-match "parquet-rs" path) 2)
+     (t 4))
+    )
+  )
+
 (add-hook 'rust-mode-hook
           '(lambda ()
              (eldoc-mode)
@@ -781,7 +790,7 @@ Otherwise transpose sexps."
              (fci-mode 1)
              (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
              (setq fill-column 90)
-             (setq rust-indent-offset 2)
+             (setq rust-indent-offset (get-rust-indent-offset))
              (setq company-minimum-prefix-length 2)
              (setq cargo-process--enable-rust-backtrace 1)
              (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
