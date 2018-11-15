@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Sun Nov 11 15:57:29 2018.
+;;; Last Modified: Wed Nov 14 22:02:17 2018.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -23,6 +23,7 @@
 
 (require 'cl)
 (global-flycheck-mode)
+(setq flycheck-pos-tip-timeout 9999) ;; set timeout to a large enough value.
 
 ;;; Set $PATH and exec-path from shell
 (exec-path-from-shell-initialize)
