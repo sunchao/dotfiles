@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Wed Nov  7 22:28:37 2018.
+;;; Last Modified: Sun Nov 11 15:57:29 2018.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -793,6 +793,7 @@ Otherwise transpose sexps."
              (setq rust-indent-offset (get-rust-indent-offset))
              (setq company-minimum-prefix-length 2)
              (setq cargo-process--enable-rust-backtrace 1)
+             (setq rust-format-on-save t)
              (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
              (face-spec-set
               'rust-unsafe-face

@@ -3,12 +3,12 @@
 	email = sunchao@uber.com
 [alias]
   co = checkout
-  ca = commit --amend
+  ca = commit -a --amend
   ci = commit
   st = status
   lg = log -p
   lp = log --pretty=oneline
-  br = branch
+  br = branch --sort=committerdate
   df = diff
   df1 = diff @~1
   df2 = diff @~2
