@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Wed Nov 14 22:02:17 2018.
+;;; Last Modified: Thu Nov 29 23:00:21 2018.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -294,6 +294,11 @@ Otherwise transpose sexps."
       (save-excursion
         (insert lhs)))))
 
+(defun open-or-switch-to (file)
+  (let ((existing-buffer (find-buffer-visiting file)))
+    (cond (existing-buffer (switch-to-buffer existing-buffer))
+          (t (find-file-existing file)))))
+
 (defun window-half-height ()
   (max 1 (/ (1- (window-height (selected-window))) 2)))
 
@@ -491,12 +496,6 @@ Otherwise transpose sexps."
 ;; (add-hook 'c-mode-hook 'impala-set-c-style)
 ;; (add-hook 'c++-mode-hook 'impala-set-c-style)
 
-;; For RecordService development
-(defun open-or-switch-to (file)
- (let ((existing-buffer (find-buffer-visiting file)))
-   (cond (existing-buffer (switch-to-buffer existing-buffer))
-         (t (find-file-existing file)))))
-
 (setq-default c-basic-offset 2 c-default-style "linux")
 (setq-default tab-width 2 indent-tabs-mode nil)
 
@@ -520,7 +519,6 @@ Otherwise transpose sexps."
           (replace-regexp-in-string "\\.h$" ".cc" (buffer-file-name)))
          (t (error "Not a .cc or .h file: %s" (buffer-file-name))))))
         (open-or-switch-to other-file)))
-(global-set-key (kbd "M-p") 'switch-to-header-or-impl)
 
 
 ;;; ---------------------------------------------------------------------------
@@ -711,13 +709,26 @@ Otherwise transpose sexps."
 ;;; ---------------------------------------------------------------------------
 ;;; Go Mode
 
+(defun switch-test-file ()
+  "Switch between xx.go file and xx_test.go file."
+  (interactive)
+  (let ((other-file
+         (cond
+          ((not (buffer-file-name)) (error "Buffer not visiting a file"))
+          ((string-match-p "\\(\\.*\\)_test.go$" (buffer-file-name))
+           (replace-regexp-in-string "\\(\\.*\\)_test.go$" "\\1.go"  (buffer-file-name)))
+          ((string-match-p "\\(\\.*\\).go$" (buffer-file-name))
+           (replace-regexp-in-string "\\(\\.*\\).go$" "\\1_test.go" (buffer-file-name)))
+          (t (error "Not a xx.go or xx_test.go file: %s" (buffer-file-name))))))
+    (open-or-switch-to other-file)))
+
 ;;; Copy GOPATH
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "GOPATH"))
 ;; TODO: parse GOPATH and populate PATH with entries
-(setenv "PATH" (concat (getenv "PATH") ":/Users/chao/go/bin"))
-(setq exec-path (cons "/Users/chao/go/bin" exec-path))
+;; (setenv "PATH" (concat (getenv "PATH") ":/Users/chao/go/bin"))
+;; (setq exec-path (cons "/Users/chao/go/bin" exec-path))
 
 (require 'go-guru)
 
@@ -731,21 +742,27 @@ Otherwise transpose sexps."
 ;;; 3) M-.: jump to definition
 ;;; 4) C-c C-d: describe definition
 
+
 (defun my-go-mode-hook ()
   (whitespace-mode -1) ; don't highlight hard tabs
   (local-set-key (kbd "M-.") 'godef-jump)
   (auto-complete-mode 1)
+  (flycheck-mode 1)
+  (fci-mode 1)
   (add-hook 'before-save-hook 'gofmt-before-save)
   (if (not (string-match "go" compile-command))
     (set (make-local-variable 'compile-command)
       "go generate && go build -v && go test -v && go vet"))
   ; Godef jump key binding
+  (local-set-key (kbd "M-p") 'switch-test-file)
   (local-set-key (kbd "M-.") 'godef-jump)
   (local-set-key (kbd "C-c C-k") 'godoc)
   (local-set-key (kbd "C-q n") 'flycheck-next-error)
   (local-set-key (kbd "C-q p") 'flycheck-previous-error)
   (local-set-key (kbd "C-x t") 'go-test-current-test)
   (local-set-key (kbd "C-x f") 'go-test-current-file)
+  (local-set-key (kbd "C-c C-f") 'find-file-in-repository)
+
   (setq
    gofmt-command "goimports"
    tab-width 2         ; display tabs as two-spaces
