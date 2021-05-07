@@ -1,12 +1,12 @@
 [user]
 	name = Chao Sun
-	email = sunchao@uber.com
+	email = sunchao@apache.org
 [alias]
   co = checkout
   ca = commit -a --amend
   ci = commit
   st = status
-  lg = log -p
+  lg = log --date=relative --color --graph --pretty=format:'%Cred%h%Creset %C(blue)%G?%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold yellow)<%an>%Creset  %C(cyan)<%cn>%Creset' --abbrev-commit
   lp = log --pretty=oneline
   br = branch --sort=committerdate
   df = diff
@@ -27,3 +27,5 @@
 	insteadOf = git://code.uber.internal/
 [url "ssh://git@github.com/uber/"]
 	insteadOf = https://github.com/uber/
+[pull]
+	ff = only
