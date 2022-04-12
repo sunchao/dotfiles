@@ -16,7 +16,7 @@
   (find-file (concat (emacs-conf-dir) "/chao-init.el")))
 
 ;;; Disable the undo-tree mode
-(global-undo-tree-mode 0)
+;; (global-undo-tree-mode 0)
 
 ;;; ---------------------------------------------------------------------------
 ;;; A bunch of config setups
@@ -26,7 +26,7 @@
 (setq flycheck-pos-tip-timeout 9999) ;; set timeout to a large enough value.
 
 ;;; Set $PATH and exec-path from shell
-(exec-path-from-shell-initialize)
+;; (exec-path-from-shell-initialize)
 
 ;;; Set font and keybindings specific to OSs
 (let ((sys (symbol-name system-type)))
