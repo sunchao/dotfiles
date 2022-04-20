@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Thu Nov 29 23:00:21 2018.
+;;; Last Modified: Wed Apr 20 08:54:19 2022.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -15,13 +15,9 @@
   (interactive)
   (find-file (concat (emacs-conf-dir) "/chao-init.el")))
 
-;;; Disable the undo-tree mode
-;; (global-undo-tree-mode 0)
-
 ;;; ---------------------------------------------------------------------------
 ;;; A bunch of config setups
 
-(require 'cl)
 (global-flycheck-mode)
 (setq flycheck-pos-tip-timeout 9999) ;; set timeout to a large enough value.
 
@@ -39,8 +35,7 @@
          (progn
            (setq x-super-keysym 'meta)))))
 
-;; set tab width
-;; use space instead of tab
+;; Set tab width, and use space instead of tab
 (setq-default indent-tabs-mode nil)
 (setq default-tab-width 2)
 (setq indent-line-function 'insert-tab)
@@ -48,26 +43,30 @@
 (loop for x downfrom 40 to 1 do
       (setq tab-stop-list (cons (* x 2) tab-stop-list)))
 
-;; starting up options
+;; Start up options
 (setq max-lisp-eval-depth 50000)
 (setq max-specpdl-size 100000)
 (setq default-major-mode 'text-mode) ;; set default mode to be text
 (show-paren-mode t) ;; show parenthesis matchup
 (line-number-mode t) ;; show line number
 (column-number-mode t) ;; show column number
-(tool-bar-mode -1) ;; don't show tool bar
-(menu-bar-mode -1) ;; don't show menu bar
-(setq x-select-enable-clipboard t) ;; don't know what's this
 (auto-fill-mode t) ;; set auto fill
+(setq x-select-enable-clipboard t) ;; don't know what's this
 (setq display-time-day-and-date t) ;; display stuff
 (setq global-font-lock-mode t) ;; enable font lock mode on all
 (setq inhibit-startup-msg t) ;; disable startup message
-(setq-default show-trailing-whitespace t)
+(setq-default show-trailing-whitespace -1)
+
+;; Full screen mode at startup
+(tool-bar-mode -1) ;; don't show tool bar
+(menu-bar-mode -1) ;; don't show menu bar
 (scroll-bar-mode -1) ;; don't need scroll bar
+(add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
+
 (setq whitespace-style
       '(trailing lines space-before-tab
                  indentation space-after-tab))
-;; backup files in a separate dir
+;; Backup files in a separate dir
 (setq backup-directory-alist `(("." . "~/.emacs_backup_files")))
 
 ;; Smoother scrolling
@@ -82,7 +81,7 @@
 (require 'fill-column-indicator)
 (setq fci-rule-color "gray")
 
-;; give duplicated buffer name more information
+;; Give duplicated buffer name more information
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward
       uniquify-seperator ":")
@@ -335,6 +334,129 @@ Otherwise transpose sexps."
     (progn
       (setq show-trailing-whitespace nil))))
 
+;;; ---------------------------------------------------------------------------
+;;; Rust Mode
+
+(require 'rustic)
+(require 'lsp-mode)
+(require 'company)
+(require 'yasnippet)
+(require 'flycheck)
+
+(defun get-rust-indent-offset ()
+  "Setting up project specific indentation."
+  (let ((path (projectile-project-root)))
+    (cond
+     ((string-match "leveldb-rs" path) 2)
+     ((string-match "parquet-rs" path) 2)
+     (t 4))
+    )
+  )
+
+(defun rk/rustic-mode-hook ()
+  "See https://github.com/brotzeit/rustic/issues/253."
+  (when buffer-file-name
+    (setq-local buffer-save-without-query t))
+  (fci-mode 1)
+  (setq fill-column 100)
+  (auto-fill-mode))
+
+(use-package lsp-mode
+  :ensure
+  :commands lsp
+  :custom
+  ;; what to use when checking on-save. "check" is default, I prefer clippy
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-rust-analyzer-command "~/.cargo/bin/rust-analyzer")
+  (lsp-eldoc-render-all t)
+  (lsp-eldoc-hook nil)
+  (lsp-idle-delay 0.6)
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  :config
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+(use-package flycheck-rust
+  :ensure t
+  :config
+  (setenv "PATH" (concat (getenv "PATH") ":~/.cargo/bin"))
+  (setq exec-path (append exec-path '("~/.cargo/bin")))
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+(use-package rustic
+  :ensure
+  :bind (:map rustic-mode-map
+              ("M-j" . lsp-ui-imenu)
+              ("M-?" . lsp-find-references)
+              ("C-c C-c p" . rustic-compile)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c q" . lsp-workspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-e" . xref-find-references))
+
+  :config
+  ;; uncomment for less flashiness
+  ;; (setq lsp-eldoc-hook nil)
+  ;; (setq lsp-enable-symbol-highlighting nil)
+  ;; (setq lsp-signature-auto-activate nil)
+
+  ;; comment to disable rustfmt on save
+  (setq rustic-format-on-save t)
+  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+
+(use-package lsp-ui
+  :ensure
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover nil)
+  (lsp-ui-doc-enable t))
+
+(add-hook 'rust-mode-hook
+          '(lambda ()
+             (fci-mode 1)
+             (setq fill-column 100)
+             (setq rust-indent-offset (get-rust-indent-offset))
+             (setq cargo-process--enable-rust-backtrace 1)
+             (face-spec-set
+              'rust-unsafe-face
+              '((t :foreground "red"
+                   :weight bold))
+              'face-defface-spec)))
+
+(defun my-cargo-run-bin (cmd)
+  (interactive "MThe binary to run: ")
+  (cargo-process-run-bin cmd))
+
+(eval-after-load 'rust-mode
+  (lambda ()
+    (define-key rust-mode-map (kbd "C-q n") 'flycheck-next-error)
+    (define-key rust-mode-map (kbd "C-q p") 'flycheck-previous-error)
+    (define-key rust-mode-map (kbd "C-c r b") 'cargo-process-build)
+    (define-key rust-mode-map (kbd "C-c r t") 'cargo-process-test)
+    (define-key rust-mode-map (kbd "C-c r g") 'cargo-process-current-test)
+    (define-key rust-mode-map (kbd "C-c r r") 'cargo-process-run)
+    (define-key rust-mode-map (kbd "C-c r w") 'my-cargo-run-bin)))
+
+(use-package company
+  :ensure
+  :custom
+  (company-idle-delay 0.5) ;; how long to wait until popup
+  ;; (company-begin-commands nil) ;; uncomment to disable popup
+  :bind
+  (:map company-active-map
+	      ("C-n". company-select-next)
+	      ("C-p". company-select-previous)
+	      ("M-<". company-select-first)
+	      ("M->". company-select-last)))
+
+(use-package yasnippet
+  :ensure
+  :config
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook 'yas-minor-mode)
+  (add-hook 'text-mode-hook 'yas-minor-mode))
 
 ;;; ---------------------------------------------------------------------------
 ;;; Magit Mode
@@ -383,15 +505,6 @@ Otherwise transpose sexps."
 
 (autoload 'enable-paredit-mode "paredit" t)
 (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-
-
-;;; ---------------------------------------------------------------------------
-;;; IDO Mode
-
-;;; TODO: consider Helm mode as a replacement
-(ido-mode t)
-(global-set-key (kbd "C-x C-f") 'ido-find-file)
-(setq ido-enable-flex-matching nil) ;; enable fuzzy matching
 
 
 ;;; ---------------------------------------------------------------------------
@@ -774,65 +887,6 @@ Otherwise transpose sexps."
 
 (require 'go-eldoc)
 (add-hook 'go-mode-hook 'go-eldoc-setup)
-
-
-;;; ---------------------------------------------------------------------------
-;;; Rust Mode
-
-(require 'rust-mode)
-(require 'racer)
-(require 'flycheck)
-(require 'flycheck-rust)
-
-(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-
-(setq
- racer-cmd (concat (getenv "HOME") "/.cargo/bin/racer")
- racer-cargo-home (concat (getenv "HOME") "/.cargo")
- company-tooltip-align-annotations t)
-
-(defun get-rust-indent-offset ()
-  (let ((path (projectile-project-root)))
-    (cond
-     ((string-match "leveldb-rs" path) 2)
-     ((string-match "parquet-rs" path) 2)
-     (t 4))
-    )
-  )
-
-(add-hook 'rust-mode-hook
-          '(lambda ()
-             (eldoc-mode)
-             (company-mode)
-             (racer-mode)
-             (fci-mode 1)
-             (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-             (setq fill-column 90)
-             (setq rust-indent-offset (get-rust-indent-offset))
-             (setq company-minimum-prefix-length 2)
-             (setq cargo-process--enable-rust-backtrace 1)
-             (setq rust-format-on-save t)
-             (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
-             (face-spec-set
-              'rust-unsafe-face
-              '((t :foreground "red"
-                   :weight bold))
-              'face-defface-spec)))
-
-(defun my-cargo-run-bin (cmd)
-    (interactive "MThe binary to run: ")
-    (cargo-process-run-bin cmd))
-
-(eval-after-load 'rust-mode
-  (lambda ()
-    (define-key rust-mode-map (kbd "C-q n") 'flycheck-next-error)
-    (define-key rust-mode-map (kbd "C-q p") 'flycheck-previous-error)
-    (define-key rust-mode-map (kbd "C-c r b") 'cargo-process-build)
-    (define-key rust-mode-map (kbd "C-c r t") 'cargo-process-test)
-    (define-key rust-mode-map (kbd "C-c r g") 'cargo-process-current-test)
-    (define-key rust-mode-map (kbd "C-c r r") 'cargo-process-run)
-    (define-key rust-mode-map (kbd "C-c r w") 'my-cargo-run-bin)))
-
 
 ;;; ---------------------------------------------------------------------------
 ;;; Haskell Mode
