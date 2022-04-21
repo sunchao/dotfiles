@@ -1,5 +1,5 @@
 ;;; Emacs Configuration for Chao Sun
-;;; Last Modified: Wed Apr 20 08:54:19 2022.
+;;; Last Modified: Wed Apr 20 14:47:56 2022.
 
 ;;; 'lisp' contains a set of language-specific elisp files, besides
 ;;; the init.el.
@@ -318,6 +318,8 @@ Otherwise transpose sexps."
 (global-set-key (kbd "C-x 4") 'split-3-windows)
 (global-set-key (kbd "C-x 5") 'split-4-windows)
 
+;;; Ace-Window
+(global-set-key (kbd "C-u") 'ace-window)
 
 ;;; ---------------------------------------------------------------------------
 ;;; Text Mode
@@ -433,10 +435,9 @@ Otherwise transpose sexps."
   (lambda ()
     (define-key rust-mode-map (kbd "C-q n") 'flycheck-next-error)
     (define-key rust-mode-map (kbd "C-q p") 'flycheck-previous-error)
-    (define-key rust-mode-map (kbd "C-c r b") 'cargo-process-build)
-    (define-key rust-mode-map (kbd "C-c r t") 'cargo-process-test)
-    (define-key rust-mode-map (kbd "C-c r g") 'cargo-process-current-test)
-    (define-key rust-mode-map (kbd "C-c r r") 'cargo-process-run)
+    (define-key rust-mode-map (kbd "C-c r b") 'rustic-cargo-build)
+    (define-key rust-mode-map (kbd "C-c r t") 'rustic-cargo-test)
+    (define-key rust-mode-map (kbd "C-c r g") 'rustic-cargo-current-test)
     (define-key rust-mode-map (kbd "C-c r w") 'my-cargo-run-bin)))
 
 (use-package company
