@@ -62,24 +62,24 @@ require("packer").startup(function(use)
 
 
   -- 2. Attach Neovim to rust-analyzer
-  use 'neovim/nvim-lspconfig' 
+  use 'neovim/nvim-lspconfig'
   use 'simrat39/rust-tools.nvim'
 
   -- 3. Install the Complete and Snippets plugins
-  
+
   -- Completion framework:
-  use 'hrsh7th/nvim-cmp' 
-  
+  use 'hrsh7th/nvim-cmp'
+
   -- LSP completion source:
   use 'hrsh7th/cmp-nvim-lsp'
-  
+
   -- Useful completion sources:
   use 'hrsh7th/cmp-nvim-lua'
   use 'hrsh7th/cmp-nvim-lsp-signature-help'
-  use 'hrsh7th/cmp-vsnip'                             
-  use 'hrsh7th/cmp-path'                              
-  use 'hrsh7th/cmp-buffer'                            
-  use 'hrsh7th/vim-vsnip'                             
+  use 'hrsh7th/cmp-vsnip'
+  use 'hrsh7th/cmp-path'
+  use 'hrsh7th/cmp-buffer'
+  use 'hrsh7th/vim-vsnip'
 
 
 end)
@@ -108,7 +108,7 @@ rt.setup({
   },
 })
 
--- LSP Diagnostics Options Setup 
+-- LSP Diagnostics Options Setup
 local sign = function(opts)
   vim.fn.sign_define(opts.name, {
     texthl = opts.name,
@@ -172,7 +172,7 @@ cmp.setup({
     { name = 'nvim_lsp_signature_help'},            -- display function signatures with current parameter emphasized
     { name = 'nvim_lua', keyword_length = 2},       -- complete neovim's Lua runtime API such vim.lsp.*
     { name = 'buffer', keyword_length = 2 },        -- source current buffer
-    { name = 'vsnip', keyword_length = 2 },         -- nvim-cmp source for vim-vsnip 
+    { name = 'vsnip', keyword_length = 2 },         -- nvim-cmp source for vim-vsnip
     { name = 'calc'},                               -- source for math calculation
   },
   window = {
