@@ -1,3 +1,5 @@
+
+
 -- ensure the packer plugin manager is installed
 local ensure_packer = function()
   local fn = vim.fn
@@ -13,6 +15,8 @@ end
 local packer_bootstrap = ensure_packer()
 
 require("packer").startup(function(use)
+  -- Color Theme
+  use "rebelot/kanagawa.nvim"
   -- Packer can manage itself
   use("wbthomason/packer.nvim")
   -- Collection of common configurations for the Nvim LSP client
@@ -76,13 +80,16 @@ require("packer").startup(function(use)
   -- Useful completion sources:
   use 'hrsh7th/cmp-nvim-lua'
   use 'hrsh7th/cmp-nvim-lsp-signature-help'
-  use 'hrsh7th/cmp-vsnip'
-  use 'hrsh7th/cmp-path'
-  use 'hrsh7th/cmp-buffer'
-  use 'hrsh7th/vim-vsnip'
 
+  use 'puremourning/vimspector'
 
 end)
+
+
+require('kanagawa').setup({
+    keywordStyle = { italic = false, bold = true },
+})
+vim.cmd("colorscheme kanagawa")
 
 require("mason").setup({
   ui = {
@@ -195,6 +202,7 @@ cmp.setup({
 })
 
 require('opts')
+require('keys')
 
 -- the first run will install packer and our plugins
 if packer_bootstrap then
