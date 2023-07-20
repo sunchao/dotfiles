@@ -55,6 +55,15 @@ require("packer").startup(function(use)
 
   -- Some color scheme other then default
   use("arcticicestudio/nord-vim")
+  
+  -- Navitage to any word in the file
+  use { 'phaazon/hop.nvim', branch = 'v2' } 
+
+  -- Move working directory to the project root
+  use {
+    'notjedi/nvim-rooter.lua',
+    config = function() require'nvim-rooter'.setup() end
+  }
 
   -- -----
   -- Rust configurations
@@ -200,6 +209,11 @@ cmp.setup({
       end,
   },
 })
+
+require 'hop'.setup {
+    keys = 'etovxqpdygfblzhckisuran',
+    jump_on_sole_occurrence = false,
+}
 
 require('opts')
 require('keys')
