@@ -1,3 +1,29 @@
+local opt = vim.opt -- with vim.opt we can set global, window and buffer settings, acting like :set in vimscript
+local set = vim.opt
+local o = vim.o
+local cmd = vim.api.nvim_command
+
+vim.cmd([[
+set tabstop=4
+set shiftwidth=4
+set expandtab
+set smartindent
+]])
+
+opt.number = true
+opt.relativenumber = true
+opt.signcolumn = "yes"
+set.cursorline = true
+
+opt.ignorecase = true -- bool: Ignore case in search patterns
+opt.smartcase = true -- bool: Override ignorecase if search contains capitals
+opt.incsearch = true -- bool: Use incremental search
+opt.hlsearch = false -- bool: Highlight search matches
+
+opt.expandtab = true -- bool: Use spaces instead of tabs
+opt.shiftwidth = 4 -- num:  Size of an indent
+opt.softtabstop = 4 -- num:  Number of spaces tabs count for in insert mode
+opt.tabstop = 4 -- num:  Number of spaces tabs count for
 
 --Set completeopt to have a better completion experience
 -- :help completeopt

@@ -1,5 +1,3 @@
-
-
 -- ensure the packer plugin manager is installed
 local ensure_packer = function()
   local fn = vim.fn
@@ -63,6 +61,29 @@ require("packer").startup(function(use)
   use {
     'notjedi/nvim-rooter.lua',
     config = function() require'nvim-rooter'.setup() end
+  }
+
+  -- Git
+  use "sindrets/diffview.nvim"
+
+  -- Better Escape
+  use {
+    "max397574/better-escape.nvim",
+    config = function()
+    require("better_escape").setup()
+    end,
+  }
+
+  -- Auto pair parenthesis
+  use {
+    "windwp/nvim-autopairs",
+    config = function() require("nvim-autopairs").setup {} end
+  }
+
+  -- Status line
+  use {
+    'nvim-lualine/lualine.nvim',
+    requires = { 'nvim-tree/nvim-web-devicons', opt = true }
   }
 
   -- -----
@@ -210,10 +231,29 @@ cmp.setup({
   },
 })
 
+require('lualine').setup {
+    options = {
+        theme = 'kanagawa',
+        fmt = string.lower,
+        component_separators = { left = '', right = '' },
+        section_separators = { left = '', right = '' },
+    }
+}
+
+-- Better Escape
+require("better_escape").setup {
+    mapping = { "jj", "jk" }, -- a table with mappings to use
+    timeout = vim.o.timeoutlen, -- the time in which the keys must be hit in ms. Use option timeoutlen by default
+    clear_empty_lines = false, -- clear line after escaping if there is only whitespace
+    keys = "<Esc>", -- keys used for escaping, if it is a function will use the result everytime
+}
+
 require 'hop'.setup {
     keys = 'etovxqpdygfblzhckisuran',
     jump_on_sole_occurrence = false,
 }
+
+require 'nvim-autopairs'.setup {}
 
 require('opts')
 require('keys')

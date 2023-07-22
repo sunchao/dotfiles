@@ -35,6 +35,7 @@ map('n', '<leader>bl', ':blast<CR>', {})
 map('n', '<leader>bd', ':bdelete<CR>', {})
 
 -- Telescope
+map("n", "<leader>f", ":lua require('telescope.builtin').oldfiles()<cr>")
 map("n", "<leader>ff", ":lua require('telescope.builtin').find_files()<cr>")
 map("n", "<leader>fm", ":Telescope media_files<cr>")
 map("n", "<leader>fg", ":lua require('telescope.builtin').live_grep()<cr>")
