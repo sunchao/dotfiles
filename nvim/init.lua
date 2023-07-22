@@ -113,6 +113,14 @@ require("packer").startup(function(use)
 
   use 'puremourning/vimspector'
 
+  use 'nvim-treesitter/nvim-treesitter' -- better syntax
+  use 'folke/todo-comments.nvim' -- better TODO comments
+  use 'BurntSushi/ripgrep'
+  use 'numToStr/Comment.nvim'
+  use 'RRethy/vim-illuminate' 
+  use { 'kyazdani42/nvim-tree.lua', -- Filesystem navigation
+        requires = 'kyazdani42/nvim-web-devicons' } -- Filesystem icons
+
 end)
 
 
@@ -254,6 +262,74 @@ require 'hop'.setup {
 }
 
 require 'nvim-autopairs'.setup {}
+
+require('todo-comments').setup {
+    colors = {
+        error = { "DiagnosticError", "ErrorMsg", "#de5d68" },
+        warning = { "DiagnosticWarning", "WarningMsg", "#eeb927" },
+        info = { "DiagnosticInfo", "#57a5e5" },
+        hint = { "DiagnosticHint", "#bb70d2" },
+        default = { "Identifier", "#de5d68" },
+    },
+}
+
+require('nvim-tree').setup {
+    sort_by = "case_sensitive",
+    view = {
+        adaptive_size = false,
+        mappings = {
+            list = {
+                { key = "u", action = "dir_up" },
+            },
+        },
+    },
+    renderer = {
+        group_empty = true,
+        icons = {
+            git_placement = "after",
+            glyphs = {
+                git = {
+                    unstaged = "-",
+                    staged = "s",
+                    untracked = "u",
+                    renamed = "r",
+                    deleted = "d",
+                    ignored = "i",
+                },
+            },
+        },
+    },
+    filters = {
+        dotfiles = false,
+    },
+    git = {
+        ignore = false,
+    },
+}
+
+require('nvim-treesitter.configs').setup {
+  ensure_installed = { "lua", "rust", "toml" },
+  auto_install = true,
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting=false,
+  },
+  ident = { enable = true }, 
+  rainbow = {
+    enable = true,
+    extended_mode = true,
+    max_file_lines = nil,
+  }
+}
+
+-- Comment Setup
+require('Comment').setup({
+    mappings = {
+        basic = false,
+        extra = false,
+        extended = false,
+    },
+})
 
 require('opts')
 require('keys')

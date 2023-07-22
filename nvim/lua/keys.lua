@@ -73,6 +73,10 @@ map('n', "Db", ":call vimspector#ToggleBreakpoint()<cr>")
 map('n', "Dw", ":call vimspector#AddWatch()<cr>")
 map('n', "De", ":call vimspector#Evaluate()<cr>")
 
+-- Tree toggle
+map("n", "<leader>nt", ":NvimTreeToggle<CR>")
+
+
 -- LSP Navigation
 -- Code Actions
 map('n', "ca", ":lua vim.lsp.buf.code_action()<CR>")
