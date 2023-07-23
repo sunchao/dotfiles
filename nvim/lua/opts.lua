@@ -14,6 +14,7 @@ opt.number = true
 opt.relativenumber = true
 opt.signcolumn = "yes"
 set.cursorline = true
+opt.swapfile = false
 
 opt.ignorecase = true -- bool: Ignore case in search patterns
 opt.smartcase = true -- bool: Override ignorecase if search contains capitals

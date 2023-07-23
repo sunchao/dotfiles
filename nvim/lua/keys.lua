@@ -34,11 +34,30 @@ map('n', '<leader>bf', ':bfirst<CR>', {})
 map('n', '<leader>bl', ':blast<CR>', {})
 map('n', '<leader>bd', ':bdelete<CR>', {})
 
+function find_files_git_dir()
+  local git_dir = vim.fn.system(string.format("git -C %s rev-parse --show-toplevel", vim.fn.expand("%:p:h")))
+  git_dir = string.gsub(git_dir, "\n", "") -- remove newline character from git_dir
+  local opts = {
+    cwd = git_dir,
+  }
+  require('telescope.builtin').find_files(opts)
+end
+
+
+function live_grep_git_dir()
+  local git_dir = vim.fn.system(string.format("git -C %s rev-parse --show-toplevel", vim.fn.expand("%:p:h")))
+  git_dir = string.gsub(git_dir, "\n", "") -- remove newline character from git_dir
+  local opts = {
+    cwd = git_dir,
+  }
+  require('telescope.builtin').live_grep(opts)
+end
+
 -- Telescope
 map("n", "<leader>f", ":lua require('telescope.builtin').oldfiles()<cr>")
-map("n", "<leader>ff", ":lua require('telescope.builtin').find_files()<cr>")
+map("n", "<leader>ff", ":lua find_files_git_dir()<cr>")
 map("n", "<leader>fm", ":Telescope media_files<cr>")
-map("n", "<leader>fg", ":lua require('telescope.builtin').live_grep()<cr>")
+map("n", "<leader>fg", ":lua live_grep_git_dir()<cr>")
 map("n", "<leader>fb", ":lua require('telescope.builtin').buffers()<cr>")
 map("n", "<leader>fh", ":lua require('telescope.builtin').help_tags()<cr>")
 map("n", "<leader>fd", ":lua require('telescope.builtin').diagnostics()<cr>")
@@ -75,7 +94,6 @@ map('n', "De", ":call vimspector#Evaluate()<cr>")
 
 -- Tree toggle
 map("n", "<leader>nt", ":NvimTreeToggle<CR>")
-
 
 -- LSP Navigation
 -- Code Actions
