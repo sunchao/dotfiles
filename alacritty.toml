@@ -1,0 +1,39 @@
+[general]
+import = ["~/.config/alacritty/themes/aura.toml"]
+
+[colors.primary]
+background = "#181818"
+
+[window]
+decorations = "transparent"
+opacity = 1
+startup_mode = "Maximized"
+padding = { x = 4, y = 28 }
+
+[env]
+TERM = "alacritty"
+
+[bell]
+color = "#003300"
+duration = 32
+
+[font]
+size = 14
+offset = { x = 1, y = 1 }
+normal      = { family = "Iosevka Term", style = "Regular" }
+bold        = { family = "Iosevka Term", style = "Bold" }
+italic      = { family = "Iosevka Term", style = "Italic" }
+bold_italic = { family = "Iosevka Term", style = "Bold Italic" }
+
+[selection]
+save_to_clipboard = true
+
+[keyboard]
+bindings = [
+	{ chars = "\u001F", key = "Slash", mods = "Control" },
+	{ chars = "\u001F", key = "Slash", mods = "Control|Shift" },
+	{ chars = "\u0000", key = "Space", mods = "Control" },
+	{ action = "None", key = "W", mods = "Command" },
+	{ action = "ToggleFullscreen", key = "Return", mods = "Command" },
+	{ action = "SpawnNewInstance", key = "N", mods = "Command" }
+]
